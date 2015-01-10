@@ -620,8 +620,8 @@ public class SoomlaEditorData
 	{
 
 		//beginning creating script (1)
-		string strLibraries = "using UnityEngine;\nusing System.Collections;\nusing System.Collections.Generic;\n\n";
-		string strCreatingClass = "namespace Soomla.Store.Example {\n\n\tpublic class SoomlaWorkFlowAssets : IStoreAssets\t{\n\n";
+		string strLibraries = "using UnityEngine;\nusing System.Collections;\nusing System.Collections.Generic;\nusing Soomla.Store;\n\n";
+		string strCreatingClass = "namespace YourAppNamespace {\n\n\tpublic class SoomlaAssets : IStoreAssets\t{\n\n";
 
 		//ending creating script()
 		string closeScript = "\t}\n}";
@@ -739,7 +739,7 @@ public class SoomlaEditorData
 		string getCategories = "\t\tpublic VirtualCategory[] GetCategories()\t{\n" +
 						"\t\t\treturn new VirtualCategory[]{GENERAL_CATEGORY};\n\t\t}\n\n";
 
-		string path = @"Assets/SoomlaEditor/SoomlaWorkFlow.cs";
+		string path = @"Assets/SoomlaAssets.cs";
 		using (StreamWriter sw = File.CreateText(path))
 		{
 			sw.Write(strLibraries);
