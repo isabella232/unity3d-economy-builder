@@ -65,6 +65,7 @@ public class SoomlaEditorWindow : EditorWindow {
 		if(GUI.Button(new Rect(400, 220, 200, 50), "Generate"))
 		{
 			editorData.WriteToJSONFile(editorData.toJSONObject());
+			editorData.generateSoomlaWorkFlow();
 		}
 	}
 
@@ -350,6 +351,8 @@ public class SoomlaEditorWindow : EditorWindow {
 			GUILayout.Label("Name:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.1f));
 			GUILayout.Label("Description:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.2f));
 			GUILayout.Label("Price:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.06f));
+			GUILayout.Label("Amount:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.06f));
+			GUILayout.Label("Currency ID:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.1f));
 		}
 		GUILayout.EndHorizontal ();
 	}
@@ -363,6 +366,37 @@ public class SoomlaEditorWindow : EditorWindow {
 			currencyPack.description = GUILayout.TextField(currencyPack.description, 16, EditorStyles.textField, GUILayout.Width(this.position.width*0.2f));
 			currencyPack.marketInfo.price = GUILayout.TextField(currencyPack.marketInfo.price, 5, EditorStyles.textField, GUILayout.Width(this.position.width*0.06f));
 			currencyPack.marketInfo.price = editSettingsForPrice(currencyPack.marketInfo.price);
+
+			if (editorData.currencies.Count == 0)
+			{
+				GUI.enabled = false;
+			}
+			
+			currencyPack.currency_amount = GUILayout.TextField (currencyPack.currency_amount, 5, EditorStyles.textField, GUILayout.Width(this.position.width*0.06f));
+			currencyPack.currency_amount = Regex.Replace (currencyPack.currency_amount, "[^0-9]", "");
+			
+			if (editorData.currencies.Count != 0)
+			{
+				int indexInArray = 0;
+				List <string> currencyNames = new List<string>();
+				for (int i = 0; i < editorData.currencies.Count; i++)
+				{
+					currencyNames.Add(editorData.currencies[i].name);
+					if (currencyPack.currency_itemId == null)
+					{
+						indexInArray = 0;
+					}
+					else if (editorData.currencies[i].ID == currencyPack.currency_itemId)
+					{
+						indexInArray = i;
+					}
+				}
+				
+				int index = EditorGUILayout.Popup(indexInArray, currencyNames.ToArray(), GUILayout.Width(this.position.width*0.1f)); 
+				currencyPack.currency_itemId = editorData.currencies[index].ID;
+			}
+			
+			GUI.enabled = true;
 
 			if(isNewCurrencyPack)
 			{
