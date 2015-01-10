@@ -18,6 +18,9 @@ public class SoomlaEditorWindow : EditorWindow {
 		categories,
 	};
 
+	string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Upgradable", "Single Use Pack"};
+	int goodTypeIndex = 0;
+	
 	private screens screenNumber = screens.goods;
 
 	[MenuItem ("Window/Soomla Editor Window")]
@@ -59,19 +62,18 @@ public class SoomlaEditorWindow : EditorWindow {
 			}
 		}
 		EditorGUILayout.EndHorizontal();
-		
-		this.ShowData();
-
-		if(GUI.Button(new Rect(400, 220, 200, 50), "Generate"))
+		if(GUILayout.Button("Generate"))
 		{
 			editorData.WriteToJSONFile(editorData.toJSONObject());
 		}
+
+		this.ShowData();
+
 	}
 
 
 	void ShowData()
 	{
-		scrollPos = GUILayout.BeginScrollView (scrollPos, GUILayout.Width (this.position.width), GUILayout.Height (200));
 		{
 			switch (screenNumber) {
 				case screens.goods:
@@ -90,13 +92,37 @@ public class SoomlaEditorWindow : EditorWindow {
 					break;
 			}
 		}
-		GUILayout.EndScrollView ();
 	}
 
 	void ShowGoods()
 	{
-		ShowHintFieldsForGoods ();
+		goodTypeIndex = EditorGUILayout.Popup(goodTypeIndex, goodTypeOptions, GUILayout.Width(100));
 
+		ShowHintFieldsForGoods ();
+		
+		scrollPos = GUILayout.BeginScrollView (scrollPos, GUILayout.Width (this.position.width), GUILayout.Height (340));
+
+		if (goodTypeIndex > 0) {
+			if (goodTypeIndex == 1) {
+				editorData.AddGood(ZFGood.GoodType.singleUse);
+			}
+			else if (goodTypeIndex == 2) {
+				editorData.AddGood(ZFGood.GoodType.lifetime);
+			}
+			else if (goodTypeIndex == 3) {
+				editorData.AddGood(ZFGood.GoodType.equippable);
+			}
+			else if (goodTypeIndex == 4) {
+				editorData.AddGood(ZFGood.GoodType.goodUpgrades);
+			}
+			else if (goodTypeIndex == 5) {
+				editorData.AddGood(ZFGood.GoodType.singleUsePack);
+			}
+
+			ShowGood (editorData.newGood, true);
+			goodTypeIndex = 0;
+		}
+		
 		for (int i = 0; i < editorData.goods.Count; i++)
 		{
 			GUILayout.BeginVertical();
@@ -106,18 +132,20 @@ public class SoomlaEditorWindow : EditorWindow {
 			}
 			GUILayout.EndVertical();
 		}
-		ShowGood (editorData.newGood, true);
+
+//		ShowGood (editorData.newGood, true);
+		GUILayout.EndScrollView ();
 	}
 
 	void ShowHintFieldsForGoods()	
 	{
 		GUILayout.BeginHorizontal ();
 		{
-			GUILayout.Label("ID:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.1f));
-			GUILayout.Label("Name:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.1f));
+			GUILayout.Label("Good Type:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.15f));
+			GUILayout.Label("Item ID:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.10f));
+			GUILayout.Label("Name:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.10f));
 			GUILayout.Label("Description:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.2f));
-			GUILayout.Label("PurchaseType:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.15f));
-			GUILayout.Label("GoodType:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.15f));
+			GUILayout.Label("Purchase With:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.15f));
 			GUILayout.Label("Price:", EditorStyles.boldLabel, GUILayout.Width(this.position.width*0.06f));
 		}	
 		GUILayout.EndHorizontal ();
@@ -125,17 +153,18 @@ public class SoomlaEditorWindow : EditorWindow {
 
 	void ShowGood(ZFGood good, bool isNewGood = false)	
 	{
+		GUILayout.BeginVertical("box");
 		GUILayout.BeginHorizontal();
 		{ 
-			good.ID = GUILayout.TextField (good.ID, 16, EditorStyles.textField, GUILayout.Width (this.position.width*0.1f));
+			GUILayout.Label(good.goodType.ToString(), EditorStyles.label, GUILayout.Width(this.position.width*0.15f));
+			good.ID = GUILayout.TextField (good.ID, 16, EditorStyles.textField, GUILayout.Width (this.position.width*0.10f));
 			good.ID = Regex.Replace(good.ID, "\n", "");
-			good.name = GUILayout.TextField (good.name, 16, EditorStyles.textField, GUILayout.Width (this.position.width*0.1f));
+			good.name = GUILayout.TextField (good.name, 16, EditorStyles.textField, GUILayout.Width (this.position.width*0.10f));
 			good.name = Regex.Replace(good.name, "\n", "");
 			good.description = GUILayout.TextField (good.description, 100, EditorStyles.textField, GUILayout.Width (this.position.width*0.2f));
 			good.description = Regex.Replace(good.description, "\n", "");
 			good.typePurchase = (ZFGood.PurchaseInfo)EditorGUILayout.EnumPopup (good.typePurchase, EditorStyles.popup, GUILayout.Width(this.position.width*0.15f));
-			good.goodType = (ZFGood.GoodType)EditorGUILayout.EnumPopup (good.goodType, EditorStyles.popup, GUILayout.Width(this.position.width*0.15f));
-			if (good.typePurchase == ZFGood.PurchaseInfo.PurchaseWithMarket)
+			if (good.typePurchase == ZFGood.PurchaseInfo.Market)
 			{
 				good.marketInfo.price = GUILayout.TextField (good.marketInfo.price, 4, EditorStyles.textField, GUILayout.Width(this.position.width*0.06f));
 				good.marketInfo.price = Regex.Replace (good.marketInfo.price, "[^0-9, .]", "");
@@ -168,7 +197,7 @@ public class SoomlaEditorWindow : EditorWindow {
 						}
 					}
 					
-					int index = EditorGUILayout.Popup(indexInArray, currencyNames.ToArray(), GUILayout.Width(this.position.width*0.1f)); 
+					int index = EditorGUILayout.Popup(indexInArray, currencyNames.ToArray(), GUILayout.Width(this.position.width*0.14f)); 
 					good.virtualInfo.pvi_itemId = editorData.currencies[index].ID;
 				}
 
@@ -191,7 +220,7 @@ public class SoomlaEditorWindow : EditorWindow {
 			}
 			else
 			{
-				if(GUILayout.Button("Delete", EditorStyles.miniButton, GUILayout.Width(this.position.width*0.07f)))
+				if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20)))
 				{
 					editorData.goods.Remove(good);
 				}
@@ -199,13 +228,14 @@ public class SoomlaEditorWindow : EditorWindow {
 		}
 		GUILayout.EndHorizontal ();
 
-		if (good.typePurchase == ZFGood.PurchaseInfo.PurchaseWithMarket)
+		if (good.typePurchase == ZFGood.PurchaseInfo.Market)
 		{
-			GUILayout.BeginVertical();
-			{
+			good.marketInfo.platformOverridesEnabled = EditorGUILayout.BeginToggleGroup("Platform overrides", good.marketInfo.platformOverridesEnabled);
+			if (good.marketInfo.platformOverridesEnabled) {
 				GUILayout.BeginHorizontal();
 				{
-					good.marketInfo.useIos = GUILayout.Toggle(good.marketInfo.useIos, "iOSAppStore", EditorStyles.toggle, GUILayout.Width(this.position.width*0.1f));
+					GUILayout.Space(20);
+					good.marketInfo.useIos = GUILayout.Toggle(good.marketInfo.useIos, "iOSAppStore", EditorStyles.toggle, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = good.marketInfo.useIos;
 					good.marketInfo.iosId = GUILayout.TextField(good.marketInfo.iosId, EditorStyles.textField, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = true;
@@ -213,7 +243,8 @@ public class SoomlaEditorWindow : EditorWindow {
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				{
-					good.marketInfo.useAndroid = GUILayout.Toggle(good.marketInfo.useAndroid, "GooglePlay", EditorStyles.toggle, GUILayout.Width(this.position.width*0.1f));
+					GUILayout.Space(20);
+					good.marketInfo.useAndroid = GUILayout.Toggle(good.marketInfo.useAndroid, "GooglePlay", EditorStyles.toggle, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = good.marketInfo.useAndroid;
 					good.marketInfo.androidId = GUILayout.TextField(good.marketInfo.androidId, EditorStyles.textField, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = true;
@@ -221,7 +252,8 @@ public class SoomlaEditorWindow : EditorWindow {
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				{
-					good.marketInfo.useAmazon = GUILayout.Toggle(good.marketInfo.useAmazon, "Amazon", EditorStyles.toggle, GUILayout.Width(this.position.width*0.1f));
+					GUILayout.Space(20);
+					good.marketInfo.useAmazon = GUILayout.Toggle(good.marketInfo.useAmazon, "Amazon", EditorStyles.toggle, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = good.marketInfo.useAmazon;
 					good.marketInfo.amazonId = GUILayout.TextField(good.marketInfo.amazonId, EditorStyles.textField, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = true;
@@ -229,15 +261,17 @@ public class SoomlaEditorWindow : EditorWindow {
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				{
-					good.marketInfo.useWindowsPhone8 = GUILayout.Toggle(good.marketInfo.useWindowsPhone8, "WindowsPhone8", EditorStyles.toggle, GUILayout.Width(this.position.width*0.1f));
+					GUILayout.Space(20);
+					good.marketInfo.useWindowsPhone8 = GUILayout.Toggle(good.marketInfo.useWindowsPhone8, "WindowsPhone8", EditorStyles.toggle, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = good.marketInfo.useWindowsPhone8;
 					good.marketInfo.windowsPhone8Id = GUILayout.TextField(good.marketInfo.windowsPhone8Id, EditorStyles.textField, GUILayout.Width(this.position.width*0.15f));
 					GUI.enabled = true;
 				}
 				GUILayout.EndHorizontal();
 			}
-			GUILayout.EndVertical();
-		} 
+			EditorGUILayout.EndToggleGroup();
+		}
+		GUILayout.EndVertical();
 	}
 
 	string editSettingsForPrice(string str)
