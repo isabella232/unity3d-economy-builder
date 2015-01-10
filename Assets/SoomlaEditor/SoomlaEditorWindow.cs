@@ -106,19 +106,19 @@ public class SoomlaEditorWindow : EditorWindow {
 
 		if (goodTypeIndex > 0) {
 			if (goodTypeIndex == 1) {
-				editorData.AddGood(ZFGood.GoodType.singleUse);
+				editorData.AddGood(ZFGood.GoodType.SingleUseVG);
 			}
 			else if (goodTypeIndex == 2) {
-				editorData.AddGood(ZFGood.GoodType.lifetime);
+				editorData.AddGood(ZFGood.GoodType.LifetimeVG);
 			}
 			else if (goodTypeIndex == 3) {
-				editorData.AddGood(ZFGood.GoodType.equippable);
+				editorData.AddGood(ZFGood.GoodType.EquippableVG);
 			}
 			else if (goodTypeIndex == 4) {
-				editorData.AddGood(ZFGood.GoodType.goodUpgrades);
+				editorData.AddGood(ZFGood.GoodType.UpgradeVG);
 			}
 			else if (goodTypeIndex == 5) {
-				editorData.AddGood(ZFGood.GoodType.singleUsePack);
+				editorData.AddGood(ZFGood.GoodType.SingleUsePackVG);
 			}
 
 			ShowGood (editorData.newGood, true);
