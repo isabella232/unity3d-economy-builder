@@ -184,8 +184,17 @@ public class ZFGood
 	public string description = "";
 	public MarketInfo marketInfo = null;
 	public VirtualInfo virtualInfo = null;
-	
-	
+
+	public enum GoodType
+	{
+		LifetimeVG = 0,
+		EquippableVG,
+		SingleUseVG,
+		SingleUsePackVG,
+		UpgradeVG
+	}
+	public GoodType goodType;
+
 	public ZFGood()
 	{
 		this.ID = "item_";
@@ -201,6 +210,7 @@ public class ZFGood
 		this.typePurchase = goodInfo.typePurchase;
 		this.marketInfo = new MarketInfo(goodInfo.marketInfo);
 		this.virtualInfo = new VirtualInfo(goodInfo.virtualInfo);
+		this.goodType = goodInfo.goodType;
 	}
 
 	public void ClearFields()
@@ -211,6 +221,7 @@ public class ZFGood
 		this.typePurchase = PurchaseInfo.PurchaseWithMarket;
 		this.marketInfo.ClearFields();
 		this.virtualInfo.ClearFields();
+		this.goodType = GoodType.LifetimeVG;
 	}
 
 	public bool ifGoodFull()
@@ -279,18 +290,7 @@ public class ZFGood
 		PurchaseWithVirtualItem
 	}
 	
-	public PurchaseInfo typePurchase = PurchaseInfo.PurchaseWithMarket;
-
-	public enum GoodType
-	{
-		LifetimeVG = 0,
-		EquippableVG,
-		SingleUseVG,
-		SingleUsePackVG,
-		UpgradeVG
-	}
-
-	public GoodType goodType = GoodType.LifetimeVG;
+	public PurchaseInfo typePurchase = PurchaseInfo.PurchaseWithMarket;	
 }
 
 public class ZFCurrency
@@ -670,7 +670,14 @@ public class SoomlaEditorData
 				initMethod = "new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")";
 			else
 				initMethod = "new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")";
-			string constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" +
+
+			string equipModel = "";
+			if(goods[i].goodType == ZFGood.GoodType.EquippableVG)
+				equipModel = "\t\t\tEquippableVG.EquippingModel.LOCAL,\n";
+			else
+				equipModel = "";
+			
+			string constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
 				"\t\t\t\"" + goods[i].name + "\",\n" +
 					"\t\t\t\"" + goods[i].description + "\",\n" +
 					"\t\t\t\"" + goods[i].ID + "\",\n" +

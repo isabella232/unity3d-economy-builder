@@ -6,6 +6,7 @@ using Soomla.Store;
 
 public class SoomlaEditorWindow : EditorWindow {
 
+	private List<string> singleUseItems = new List<string> ();
 	private Vector2 scrollPos = Vector2.zero;
 	private SoomlaEditorData editorData;
 	private bool inited = false;
@@ -174,6 +175,12 @@ public class SoomlaEditorWindow : EditorWindow {
 				}
 
 				GUI.enabled = true;
+			}
+			if ( good.goodType == ZFGood.GoodType.SingleUsePackVG )
+			{
+
+				int id = 0;
+				int index = EditorGUILayout.Popup(id, singleUseItems.ToArray(), GUILayout.Width(this.position.width*0.1f));
 			}
 
 			if(isNewGood)

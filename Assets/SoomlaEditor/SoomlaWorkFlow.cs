@@ -12,11 +12,13 @@ namespace Soomla.Store.Example {
 
 		public const string CURRENCYPACK_2_PRODUCT_ID = "currencypack_2";
 
-		public const string ITEM_2_PRODUCT_ID = "item_2";
+		public const string ITEM_33_PRODUCT_ID = "item_33";
 
-		public const string ITEM__ITEM_ID = "item_";
+		public const string ITEM_5_ITEM_ID = "item_5";
 
-		public const string ITEM_3_ITEM_ID = "item_3";
+		public const string ITEM_6_PRODUCT_ID = "item_6";
+
+		public const string ITEM_4_ITEM_ID = "item_4";
 
 		public static VirtualCurrency CURRENCY_1 = new VirtualCurrency(
 			"dsa",
@@ -39,29 +41,36 @@ namespace Soomla.Store.Example {
 			new PurchaseWithMarket(CURRENCYPACK_2_PRODUCT_ID, 2.33)
 		);
 
-		public static VirtualGood ITEM_2 = new LifetimeVG(
-			"fdf",
-			"fds",
-			"item_2",
-			new PurchaseWithMarket(ITEM_2_PRODUCT_ID, 1.99)
-		);
-
-		public static VirtualGood ITEM_ = new LifetimeVG(
-			"dsa",
+		public static VirtualGood ITEM_33 = new LifetimeVG(
+			"fdaf",
 			"dasdas",
-			"item_",
-			new PurchaseWithVirtualItem(CURRENCY_1_ITEM_ID, 2)
+			"item_33",
+			new PurchaseWithMarket(ITEM_33_PRODUCT_ID, 0.0)
 		);
 
-		public static VirtualGood ITEM_3 = new LifetimeVG(
-			"daa",
-			"assa",
-			"item_3",
+		public static VirtualGood ITEM_5 = new LifetimeVG(
+			"dsaads",
+			"dasdas",
+			"item_5",
+			new PurchaseWithVirtualItem(CURRENCY_2_ITEM_ID, 32)
+		);
+
+		public static VirtualGood ITEM_6 = new SingleUseVG(
+			"ghfghfg",
+			"hjkljb",
+			"item_6",
+			new PurchaseWithMarket(ITEM_6_PRODUCT_ID, 0.0)
+		);
+
+		public static VirtualGood ITEM_4 = new SingleUseVG(
+			"dsa",
+			"ewe",
+			"item_4",
 			new PurchaseWithVirtualItem(CURRENCY_1_ITEM_ID, 2)
 		);
 
 		public static VirtualCategory GENERAL_CATEGORY = new VirtualCategory(
-			"General", new List<string>(new string[] {CURRENCY_1_ITEM_ID, CURRENCY_2_ITEM_ID, CURRENCYPACK_2_PRODUCT_ID, ITEM_2_PRODUCT_ID, ITEM__ITEM_ID, ITEM_3_ITEM_ID})
+			"General", new List<string>(new string[] {CURRENCY_1_ITEM_ID, CURRENCY_2_ITEM_ID, CURRENCYPACK_2_PRODUCT_ID, ITEM_33_PRODUCT_ID, ITEM_5_ITEM_ID, ITEM_6_PRODUCT_ID, ITEM_4_ITEM_ID})
 		);
 
 		public int GetVersion()  {
@@ -77,7 +86,7 @@ namespace Soomla.Store.Example {
 		}
 
 		public VirtualGood[] GetGoods()	{
-			return new VirtualGood[]{ITEM_2, ITEM_, ITEM_3};
+			return new VirtualGood[]{ITEM_33, ITEM_5, ITEM_6, ITEM_4};
 		}
 
 		public VirtualCategory[] GetCategories()	{
