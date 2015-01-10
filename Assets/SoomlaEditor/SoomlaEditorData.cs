@@ -194,7 +194,16 @@ public class ZFGood
 	public MarketInfo marketInfo = null;
 	public VirtualInfo virtualInfo = null;
 
-	
+	public enum GoodType
+	{
+		LifetimeVG = 0,
+		EquippableVG,
+		SingleUseVG,
+		SingleUsePackVG,
+		UpgradeVG
+	}
+	public GoodType goodType;
+
 	public ZFGood()
 	{
 		this.ID = "item_";
@@ -210,6 +219,7 @@ public class ZFGood
 		this.typePurchase = goodInfo.typePurchase;
 		this.marketInfo = new MarketInfo(goodInfo.marketInfo);
 		this.virtualInfo = new VirtualInfo(goodInfo.virtualInfo);
+		this.goodType = goodInfo.goodType;
 	}
 
 	public void ClearFields()
@@ -220,6 +230,7 @@ public class ZFGood
 		this.typePurchase = PurchaseInfo.Market;
 		this.marketInfo.ClearFields();
 		this.virtualInfo.ClearFields();
+		this.goodType = GoodType.LifetimeVG;
 	}
 
 	public bool ifGoodFull()
@@ -289,18 +300,6 @@ public class ZFGood
 	}
 	
 	public PurchaseInfo typePurchase = PurchaseInfo.Market;
-
-	public enum GoodType
-	{
-		lifetime = 0,
-		equippable,
-		singleUse,
-		goodPacks,
-		goodUpgrades,
-		singleUsePack
-	}
-
-	public GoodType goodType = GoodType.singleUse;
 }
 
 public class ZFCurrency
@@ -350,6 +349,8 @@ public class ZFCurrencyPack
 	public string ID = "currencypack_";
 	public string name = "";
 	public string description = "";
+	public string currency_itemId = "";
+	public string currency_amount = "";
 	public MarketInfo marketInfo = null;
 	
 	
@@ -363,6 +364,8 @@ public class ZFCurrencyPack
 		this.ID = currencyPack.ID;
 		this.name = currencyPack.name;
 		this.description = currencyPack.description;
+		this.currency_itemId = currencyPack.currency_itemId;
+		this.currency_amount = currencyPack.currency_amount;
 		this.marketInfo = new MarketInfo(currencyPack.marketInfo);
 	}
 	
@@ -371,12 +374,14 @@ public class ZFCurrencyPack
 		this.ID = "";
 		this.name = "";
 		this.description = "";
+		this.currency_itemId = "";
+		this.currency_amount = "";
 		this.marketInfo.ClearFields();
 	}
 
 	public bool isCurrencyPackFull()
 	{
-		if (this.ID == "" || this.name == "") {
+		if (this.ID == "" || this.name == "" || this.currency_itemId == "" || this.currency_amount == "") {
 			return false;
 		} else {
 			return true;
@@ -389,6 +394,8 @@ public class ZFCurrencyPack
 		json.AddField ("ID", this.ID);
 		json.AddField ("name", this.name);
 		json.AddField ("description", this.description);
+		json.AddField ("currency_itemId", this.currency_itemId);
+		json.AddField ("currency_amount", this.currency_amount);
 		json.AddField ("purchasableItem", marketInfo.toJSONObject()); 
 
 		return json;
@@ -399,6 +406,8 @@ public class ZFCurrencyPack
 		this.ID = json.GetField("ID").str;
 		this.name = json.GetField("name").str;
 		this.description = json.GetField("description").str;
+		this.currency_itemId = json.GetField ("currency_itemId").str;
+		this.currency_amount = json.GetField ("currency_amount").str;
 		JSONObject jsonPurchasebleItem = json.GetField ("purchasableItem");
 //		string purchaseTypeString = jsonPurchasebleItem.GetField ("purchaseType").str;
 //		if (string.Equals(purchaseTypeString, "market"))
@@ -607,5 +616,150 @@ public class SoomlaEditorData
 		return json;
 	}
 
+	public void generateSoomlaWorkFlow()
+	{
 
+		//beginning creating script (1)
+		string strLibraries = "using UnityEngine;\nusing System.Collections;\nusing System.Collections.Generic;\n\n";
+		string strCreatingClass = "namespace Soomla.Store.Example {\n\n\tpublic class SoomlaWorkFlowAssets : IStoreAssets\t{\n\n";
+
+		//ending creating script()
+		string closeScript = "\t}\n}";
+		string allVariables = "";
+		//making variables (2)
+		List<string> variablesStr = new List<string>();	
+		for (int i = 0; i < currencies.Count; i++) {
+			string item_id = currencies[i].ID.ToUpper() + "_ITEM_ID = \"" + currencies[i].ID + "\";\n\n";
+			string str = "\t\tpublic const string " + item_id;
+			allVariables += currencies[i].ID.ToUpper() + "_ITEM_ID, ";
+			variablesStr.Add(str);
+		}
+
+		for (int i = 0; i < currencyPacks.Count; i++) {
+			string item_id = currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID = \"" + currencyPacks[i].ID + "\";\n\n";
+			string str = "\t\tpublic const string " + item_id;
+			allVariables += currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, ";
+			variablesStr.Add(str);
+		}
+
+		for (int i = 0; i < goods.Count; i++) {
+			string itemOrProduct = "";
+			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market)
+				itemOrProduct = "_PRODUCT_ID";
+			else
+				itemOrProduct = "_ITEM_ID";
+			string item_id = goods[i].ID.ToUpper() + itemOrProduct + " = \"" + goods[i].ID + "\";\n\n";
+			string str = "\t\tpublic const string " + item_id;
+			allVariables += goods[i].ID.ToUpper() + itemOrProduct + ", ";
+			variablesStr.Add(str);
+		}
+
+		List<string> constructorsStr = new List<string> ();
+		//creating constructors for each soomla object
+		for (int i = 0; i < currencies.Count; i++) {
+			string constructor = currencies[i].ID.ToUpper() + " = new VirtualCurrency(\n" +
+				"\t\t\t\"" + currencies[i].name + "\",\n" +
+				"\t\t\t\"\",\n\t\t\t" +
+					currencies[i].ID.ToUpper() + "_ITEM_ID\n" +
+					"\t\t);\n\n";
+			string str = "\t\tpublic static VirtualCurrency " + constructor;
+			constructorsStr.Add(str);
+		}
+
+		for (int i = 0; i < currencyPacks.Count; i++) {
+			string constructor = currencyPacks[i].ID.ToUpper() + " = new VirtualCurrencyPack(\n" +
+				"\t\t\t\"" + currencyPacks[i].name + "\",\n" +
+					"\t\t\t\"" + currencyPacks[i].description + "\",\n" +
+					"\t\t\t\"" + currencyPacks[i].ID + "\",\n" +
+					"\t\t\t" + currencyPacks[i].currency_amount +",\n" +
+					"\t\t\t" + currencyPacks[i].currency_itemId.ToUpper() + "_ITEM_ID,\n" +
+					"\t\t\tnew PurchaseWithMarket(" + currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, " + currencyPacks[i].marketInfo.price + ")\n" +
+					"\t\t);\n\n";
+			string str = "\t\tpublic static VirtualCurrencyPack " + constructor;
+			constructorsStr.Add(str);
+		}
+
+		for (int i = 0; i < goods.Count; i++) { 
+			string initMethod = "";
+			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market)
+				initMethod = "new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")";
+			else
+				initMethod = "new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")";
+
+			string equipModel = "";
+			if(goods[i].goodType == ZFGood.GoodType.EquippableVG)
+				equipModel = "\t\t\tEquippableVG.EquippingModel.LOCAL,\n";
+			else
+				equipModel = "";
+			
+			string constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
+				"\t\t\t\"" + goods[i].name + "\",\n" +
+					"\t\t\t\"" + goods[i].description + "\",\n" +
+					"\t\t\t\"" + goods[i].ID + "\",\n" +
+					"\t\t\t" + initMethod + "\n" +
+					"\t\t);\n\n";
+			string str = "\t\tpublic static VirtualGood " + constructor;
+			constructorsStr.Add(str);
+		}
+
+		allVariables = allVariables.Remove (allVariables.Length - 2, 2);
+		string addGeneralCategory = "\t\tpublic static VirtualCategory GENERAL_CATEGORY = new VirtualCategory(\n" +
+						"\t\t\t\"General\", new List<string>(new string[] {" + allVariables + "})\n\t\t);\n\n";
+
+		//get() methods for Soomla objects
+		string getVersionMethod = "\t\tpublic int GetVersion()  {\n\t\t\treturn 0;\n\t\t}\n\n";
+
+		string currenciesSequence = "";
+		for (int i = 0; i < currencies.Count; i++) {
+			currenciesSequence += currencies[i].ID.ToUpper();
+			if(i + 1 != currencies.Count)
+				currenciesSequence += ", ";
+		}
+		string getCurrenciesMethod = "\t\tpublic VirtualCurrency[] GetCurrencies()\t{\n" +
+			"\t\t\treturn new VirtualCurrency[]{" + currenciesSequence + "};\n\t\t}\n\n";
+
+		string currencyPacksSequence = "";
+		for (int i = 0; i < currencyPacks.Count; i++) {
+			currencyPacksSequence += currencyPacks[i].ID.ToUpper();
+			if(i + 1 != currencyPacks.Count)
+				currencyPacksSequence += ", ";
+		}
+		string getCurrencyPacksMethod = "\t\tpublic VirtualCurrencyPack[] GetCurrencyPacks()\t{\n" +
+			"\t\t\treturn new VirtualCurrencyPack[]{" + currencyPacksSequence + "};\n\t\t}\n\n";
+
+		string goodsSequence = "";
+		for (int i = 0; i < goods.Count; i++) {
+			goodsSequence += goods[i].ID.ToUpper();
+			if(i + 1 != goods.Count)
+				goodsSequence += ", ";
+		}
+		string getGoodsMethod = "\t\tpublic VirtualGood[] GetGoods()\t{\n" +
+						"\t\t\treturn new VirtualGood[]{" + goodsSequence + "};\n\t\t}\n\n";
+
+		string getCategories = "\t\tpublic VirtualCategory[] GetCategories()\t{\n" +
+						"\t\t\treturn new VirtualCategory[]{GENERAL_CATEGORY};\n\t\t}\n\n";
+
+		string path = @"Assets/SoomlaEditor/SoomlaWorkFlow.cs";
+		using (StreamWriter sw = File.CreateText(path))
+		{
+			sw.Write(strLibraries);
+			sw.Write(strCreatingClass);
+			for (int i = 0; i < variablesStr.Count; i++)
+			{
+				sw.Write(variablesStr[i]);
+			}
+			for (int i = 0; i < constructorsStr.Count; i++)
+			{
+				sw.Write(constructorsStr[i]);
+			}
+			sw.Write(addGeneralCategory);			//it's optional yet
+
+			sw.Write(getVersionMethod);
+			sw.Write(getCurrenciesMethod);
+			sw.Write(getCurrencyPacksMethod);
+			sw.Write(getGoodsMethod);
+			sw.Write(getCategories);				//it's optional yet
+			sw.Write(closeScript);
+		}
+	}
 }
