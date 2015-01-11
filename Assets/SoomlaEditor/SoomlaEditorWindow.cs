@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Soomla.Store;
 
-public class SoomlaEditorWindow : EditorWindow {
+public class SoomlaEditorWindow : EditorWindow 
+{
 
-	private List<string> singleUseItems = new List<string> ();
+	private int idForSinglePack = 0;
 	private Vector2 scrollPos = Vector2.zero;
 	private SoomlaEditorData editorData;
 	private bool inited = false;
@@ -35,6 +36,7 @@ public class SoomlaEditorWindow : EditorWindow {
 	{
 		editorData = new SoomlaEditorData ();
 		editorData.ReadFromJSONFile ();
+		editorData.collectSingleUseItems();
 		inited = true;
 	}
 
@@ -43,7 +45,6 @@ public class SoomlaEditorWindow : EditorWindow {
 		if (!inited) {
 			InitSoomlaEditorData();
 		}
-
 
 		EditorGUILayout.BeginHorizontal();
 		{
@@ -104,7 +105,8 @@ public class SoomlaEditorWindow : EditorWindow {
 		
 		scrollPos = GUILayout.BeginScrollView (scrollPos, GUILayout.Width (this.position.width), GUILayout.Height (340));
 
-		if (goodTypeIndex > 0) {
+		if (goodTypeIndex > 0)
+		{
 			if (goodTypeIndex == 1) {
 				editorData.AddGood(ZFGood.GoodType.SingleUseVG);
 			}
@@ -120,6 +122,8 @@ public class SoomlaEditorWindow : EditorWindow {
 			else if (goodTypeIndex == 5) {
 				editorData.AddGood(ZFGood.GoodType.SingleUsePackVG);
 			}
+
+			editorData.collectSingleUseItems();
 
 			ShowGood (editorData.newGood, true);
 			goodTypeIndex = 0;
@@ -205,12 +209,6 @@ public class SoomlaEditorWindow : EditorWindow {
 
 				GUI.enabled = true;
 			}
-			if ( good.goodType == ZFGood.GoodType.SingleUsePackVG )
-			{
-
-				int id = 0;
-				int index = EditorGUILayout.Popup(id, singleUseItems.ToArray(), GUILayout.Width(this.position.width*0.1f));
-			}
 
 			if(isNewGood)
 			{
@@ -230,7 +228,7 @@ public class SoomlaEditorWindow : EditorWindow {
 			{
 				if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20)))
 				{
-					editorData.goods.Remove(good);
+					editorData.DeleteGood(good);
 				}
 			}
 		}
@@ -279,6 +277,38 @@ public class SoomlaEditorWindow : EditorWindow {
 			}
 			EditorGUILayout.EndToggleGroup();
 		}
+
+
+
+		if (good.goodType == ZFGood.GoodType.SingleUsePackVG) 
+		{
+			GUILayout.BeginHorizontal();
+			if (editorData.singleUseGoodsIDs.Count == 0)
+			{
+				GUI.enabled = false;
+			}
+			good.good_amount = GUILayout.TextField (good.good_amount, 5, EditorStyles.textField, GUILayout.Width(this.position.width*0.06f));
+			good.good_amount = Regex.Replace (good.good_amount, "[^0-9]", "");
+
+			int indexInArray = 0;
+			if (editorData.singleUseGoodsIDs.Count != 0)
+			{
+				for (int i = 0; i < editorData.singleUseGoodsIDs.Count; i++)
+				{
+					if (editorData.singleUseGoodsIDs[i] == good.good_itemId)
+					{
+						indexInArray = i;
+					}
+				}
+			}
+			int index = EditorGUILayout.Popup(indexInArray, editorData.singleUseGoodsIDs.ToArray(), GUILayout.Width(this.position.width*0.1f)); 
+			good.good_itemId = editorData.singleUseGoodsIDs[index];
+
+
+			GUI.enabled = true;
+			GUILayout.EndHorizontal();
+		}
+
 		GUILayout.EndVertical();
 	}
 
