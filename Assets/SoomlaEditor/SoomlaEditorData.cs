@@ -192,6 +192,9 @@ public class ZFGood
 	public string description = "";
 	public MarketInfo marketInfo = null;
 	public VirtualInfo virtualInfo = null;
+	// for pack
+	public string good_itemId = "";
+	public string good_amount = "0";
 
 	public enum GoodType
 	{
@@ -230,6 +233,8 @@ public class ZFGood
 		this.marketInfo.ClearFields();
 		this.virtualInfo.ClearFields();
 		this.goodType = GoodType.LifetimeVG;
+		this.good_itemId = "";
+		this.good_amount = "0";
 	}
 
 	public bool ifGoodFull()
@@ -256,10 +261,16 @@ public class ZFGood
 	
 	public JSONObject toJSONObject()
 	{
+
 		JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
 		json.AddField ("itemId", this.ID);
 		json.AddField ("name", this.name);
 		json.AddField ("description", this.description);
+		if (this.goodType == ZFGood.GoodType.SingleUsePackVG)
+		{
+			json.AddField("good_itemId", this.good_itemId);
+			json.AddField("good_amount", this.good_amount);
+		}
 		if (this.typePurchase == PurchaseInfo.Market) 
 		{
 			json.AddField("purchasableItem", marketInfo.toJSONObject());
@@ -291,8 +302,10 @@ public class ZFGood
 			this.virtualInfo.fromJSONObject(jsonPurchasebleItem);
 		}
 
-		if (this.goodType == ZFGood.GoodType.SingleUsePackVG) {
-
+		if (this.goodType == ZFGood.GoodType.SingleUsePackVG)
+		{
+			this.good_itemId = json.GetField("good_itemId").str;
+			this.good_amount = json.GetField("good_amount").str;
 		}
 	}
 	
@@ -513,6 +526,18 @@ public class SoomlaEditorData
 			}
 		}
 		return true;
+	}
+
+	public void DeleteGood(ZFGood good)
+	{
+		for ( int i = 0; i < goods.Count; i++)
+		{
+			if (goods[i].goodType == ZFGood.GoodType.SingleUsePackVG && goods[i].good_itemId == good.ID)
+			{
+				goods.Remove(goods[i]);
+			}
+		}
+		goods.Remove (good);
 	}
 
 	public void DeleteCurrency(ZFCurrency currency)
@@ -789,12 +814,28 @@ public class SoomlaEditorData
 			else
 				equipModel = "";
 			
-			string constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
-				"\t\t\t\"" + goods[i].name + "\",\n" +
-					"\t\t\t\"" + goods[i].description + "\",\n" +
-					"\t\t\t\"" + goods[i].ID + "\",\n" +
-					"\t\t\t" + initMethod + "\n" +
-					"\t\t);\n\n";
+			string constructor;
+
+			if (goods[i].goodType == ZFGood.GoodType.SingleUsePackVG)
+			{
+				constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
+					"\t\t\t\"" + goods[i].good_itemId + "\",\n" +
+					"\t\t\t" + goods[i].good_amount + ",\n" +
+					"\t\t\t\"" + goods[i].name + "\",\n" +
+						"\t\t\t\"" + goods[i].description + "\",\n" +
+						"\t\t\t\"" + goods[i].ID + "\",\n" +
+						"\t\t\t" + initMethod + "\n" +
+						"\t\t);\n\n";
+			}
+			else
+			{
+				constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
+					"\t\t\t\"" + goods[i].name + "\",\n" +
+						"\t\t\t\"" + goods[i].description + "\",\n" +
+						"\t\t\t\"" + goods[i].ID + "\",\n" +
+						"\t\t\t" + initMethod + "\n" +
+						"\t\t);\n\n";
+			}
 			string str = "\t\tpublic static VirtualGood " + constructor;
 			constructorsStr.Add(str);
 		}
