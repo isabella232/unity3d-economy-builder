@@ -34,7 +34,7 @@ namespace Soomla.Store.Example {
 
 		public static VirtualCurrencyPack CURRENCYPACK_2 = new VirtualCurrencyPack(
 			"gold bar",
-			"Buy, bitch!",
+			"Buy please!",
 			"currencypack_2",
 			20,
 			CURRENCY_2_ITEM_ID,
@@ -55,14 +55,14 @@ namespace Soomla.Store.Example {
 			new PurchaseWithVirtualItem(CURRENCY_2_ITEM_ID, 32)
 		);
 
-		public static VirtualGood ITEM_6 = new SingleUseVG(
+		public static VirtualGood ITEM_6 = new LifetimeVG(
 			"ghfghfg",
 			"hjkljb",
 			"item_6",
 			new PurchaseWithMarket(ITEM_6_PRODUCT_ID, 0.0)
 		);
 
-		public static VirtualGood ITEM_4 = new SingleUseVG(
+		public static VirtualGood ITEM_4 = new LifetimeVG(
 			"dsa",
 			"ewe",
 			"item_4",
