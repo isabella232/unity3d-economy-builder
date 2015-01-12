@@ -5,13 +5,14 @@ using System.IO;
 
 public class MarketInfo
 {
-	public bool platformOverridesEnabled = false;
+
+	public string productId = "productId";
 
 	public bool useIos = false;
-	public string iosId = "";
+	public string iosId = "iosProductId";
 	
 	public bool useAndroid = false;
-	public string androidId = "";
+	public string androidId = "androidProductId";
 	
 	public bool useAmazon = false;
 	public string amazonId = "";
@@ -21,7 +22,7 @@ public class MarketInfo
 	
 	public PurchaseType type = null;
 	
-	public string price = "0.0";
+	public float price = 0.99f;
 	
 	enum Consumable
 	{
@@ -34,6 +35,7 @@ public class MarketInfo
 	
 	public MarketInfo(MarketInfo marketInfo)
 	{
+		this.productId = marketInfo.productId;
 		this.useIos = marketInfo.useIos;
 		this.iosId = marketInfo.iosId;
 		this.useAndroid = marketInfo.useAndroid;
@@ -43,28 +45,13 @@ public class MarketInfo
 		this.useWindowsPhone8 = marketInfo.useWindowsPhone8;
 		this.windowsPhone8Id = marketInfo.windowsPhone8Id;
 		this.price = marketInfo.price;
-		this.platformOverridesEnabled = useAndroid || useAndroid || useAmazon || useWindowsPhone8;
 	}
 	
 	public MarketInfo() {}
 
-	public void ClearFields()
-	{
-		this.useIos = false;
-		this.iosId = "";
-		this.useAndroid = false;
-		this.androidId = "";
-		this.useAmazon = false;
-		this.amazonId = "";
-		this.useWindowsPhone8 = false;
-		this.windowsPhone8Id = "";
-		this.price = "0.0";
-		this.platformOverridesEnabled = false;
-	}
-
 	public bool ifMarketPurchaseFull()
 	{
-		if ((this.iosId != "" || this.androidId != "" || this.amazonId != "" || this.windowsPhone8Id != "") && this.price != "") {
+		if ((this.iosId != "" || this.androidId != "" || this.amazonId != "" || this.windowsPhone8Id != "") && this.price != 0.0f) {
 			return true;
 		} else {
 			return false;
@@ -76,23 +63,23 @@ public class MarketInfo
 		JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
 		JSONObject marketItem = new JSONObject (JSONObject.Type.OBJECT);
 	
-		if (this.platformOverridesEnabled) {
-			if (this.useIos)
-			{
-				marketItem.AddField ("iosId", this.iosId);
-			}
-			if (this.useAndroid) 
-			{
-				marketItem.AddField("androidId", this.androidId);
-			}
-			if (this.useAmazon)
-			{
-				marketItem.AddField("amazonId", this.amazonId);
-			}
-			if (this.useWindowsPhone8)
-			{
-				marketItem.AddField("windowsPhone8Id", this.windowsPhone8Id);
-			}
+		marketItem.AddField ("productId", this.productId);
+        
+		if (this.useIos)
+		{
+			marketItem.AddField ("iosId", this.iosId);
+		}
+		if (this.useAndroid) 
+		{
+			marketItem.AddField("androidId", this.androidId);
+		}
+		if (this.useAmazon)
+		{
+			marketItem.AddField("amazonId", this.amazonId);
+		}
+		if (this.useWindowsPhone8)
+		{
+			marketItem.AddField("windowsPhone8Id", this.windowsPhone8Id);
 		}
 		marketItem.AddField ("price", this.price);
 		marketItem.AddField ("consumable", (int)this.consumable);
@@ -106,6 +93,14 @@ public class MarketInfo
 	public void fromJSONObject(JSONObject json)
 	{
 		JSONObject marketItem = json.GetField("marketItem");
+
+		JSONObject jsonProductId = marketItem.GetField("productId");
+		if (jsonProductId != null) {
+			this.productId = marketItem.GetField("productId").str;
+		} else {
+			this.productId = "";
+		}
+        
 		JSONObject jsonIosId = marketItem.GetField ("iosId");
 
 		this.useIos = (jsonIosId != null);
@@ -135,9 +130,7 @@ public class MarketInfo
 			this.windowsPhone8Id = jsonWindowPhone8Id.str;
 		}
 		
-		this.platformOverridesEnabled = useAndroid || useAndroid || useAmazon || useWindowsPhone8;
-
-		this.price = marketItem.GetField ("price").str;
+		this.price = marketItem.GetField ("price").n;
 		this.consumable = (Consumable)int.Parse(marketItem.GetField("consumable").ToString());
 	}
 }
@@ -145,7 +138,7 @@ public class MarketInfo
 public class VirtualInfo
 {
 	public string pvi_itemId = "";
-	public string pvi_amount = "0";
+	public int pvi_amount = 10;
 	
 	public VirtualInfo(VirtualInfo virtualInfo)
 	{
@@ -155,15 +148,9 @@ public class VirtualInfo
 	
 	public VirtualInfo() { }
 	
-	public void ClearFields()
-	{
-		this.pvi_itemId = "";
-		this.pvi_amount = "0";
-	}
-	
 	public bool ifVirtualPurchaseFull()
 	{
-		if (pvi_itemId != "" && this.pvi_amount != "")
+		if (pvi_itemId != "" && this.pvi_amount != 0	)
 			return true;
 		else
 			return false;
@@ -182,19 +169,21 @@ public class VirtualInfo
 	public void fromJSONObject(JSONObject json)
 	{
 		this.pvi_itemId = json.GetField ("pvi_itemId").str;
-		this.pvi_amount = json.GetField ("pvi_amount").str;
+		this.pvi_amount = (int) json.GetField ("pvi_amount").n;
 	}
 }
 public class ZFGood	
 {
 	public string ID = "";
-	public string name = "";
-	public string description = "";
+	public string name = "Virtual Good Name";
+	public string description = "Virtual Good Description";
 	public MarketInfo marketInfo = null;
 	public VirtualInfo virtualInfo = null;
 	// for pack
 	public string good_itemId = "";
-	public string good_amount = "0";
+	public int good_amount = 10;
+
+	public bool render = true;
 
 	public enum GoodType
 	{
@@ -222,19 +211,6 @@ public class ZFGood
 		this.marketInfo = new MarketInfo(goodInfo.marketInfo);
 		this.virtualInfo = new VirtualInfo(goodInfo.virtualInfo);
 		this.goodType = goodInfo.goodType;
-	}
-
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
-		this.description = "";
-		this.typePurchase = PurchaseInfo.Market;
-		this.marketInfo.ClearFields();
-		this.virtualInfo.ClearFields();
-		this.goodType = GoodType.LifetimeVG;
-		this.good_itemId = "";
-		this.good_amount = "0";
 	}
 
 	public bool ifGoodFull()
@@ -305,7 +281,7 @@ public class ZFGood
 		if (this.goodType == ZFGood.GoodType.SingleUsePackVG)
 		{
 			this.good_itemId = json.GetField("good_itemId").str;
-			this.good_amount = json.GetField("good_amount").str;
+			this.good_amount = (int)json.GetField("good_amount").n;
 		}
 	}
 	
@@ -323,17 +299,13 @@ public class ZFCurrency
 	public string ID = "currency_";
 	public string name = "";
 
+	public bool render = true;
+
 	public ZFCurrency() { }
 	public ZFCurrency(ZFCurrency currency)
 	{
 		this.ID = currency.ID;
 		this.name = currency.name;
-	}
-
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
 	}
 
 	public bool isCurrencyFull()
@@ -363,13 +335,14 @@ public class ZFCurrency
 public class ZFCurrencyPack	
 {
 	public string ID = "currencypack_";
-	public string name = "";
-	public string description = "";
+	public string name = "Currency Pack Name";
+	public string description = "Currency Pack Description";
 	public string currency_itemId = "";
-	public string currency_amount = "";
+	public int currency_amount = 10;
 	public MarketInfo marketInfo = null;
 	
-	
+	public bool render = true;
+    
 	public ZFCurrencyPack()
 	{
 		this.marketInfo = new MarketInfo();
@@ -385,19 +358,9 @@ public class ZFCurrencyPack
 		this.marketInfo = new MarketInfo(currencyPack.marketInfo);
 	}
 	
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
-		this.description = "";
-		this.currency_itemId = "";
-		this.currency_amount = "";
-		this.marketInfo.ClearFields();
-	}
-
 	public bool isCurrencyPackFull()
 	{
-		if (this.ID == "" || this.name == "" || this.currency_itemId == "" || this.currency_amount == "") {
+		if (this.ID == "" || this.name == "" || this.currency_itemId == "" || this.currency_amount == 0) {
 			return false;
 		} else {
 			return true;
@@ -423,19 +386,9 @@ public class ZFCurrencyPack
 		this.name = json.GetField("name").str;
 		this.description = json.GetField("description").str;
 		this.currency_itemId = json.GetField ("currency_itemId").str;
-		this.currency_amount = json.GetField ("currency_amount").str;
+		this.currency_amount = (int)json.GetField ("currency_amount").n;
 		JSONObject jsonPurchasebleItem = json.GetField ("purchasableItem");
-//		string purchaseTypeString = jsonPurchasebleItem.GetField ("purchaseType").str;
-//		if (string.Equals(purchaseTypeString, "market"))
-//		{
-//			this.typePurchase = PurchaseInfo.PurchaseWithMarket;
-			this.marketInfo.fromJSONObject(jsonPurchasebleItem);
-//		}
-//		else
-//		{
-//			this.typePurchase = PurchaseInfo.PurchaseWithVirtualItem;
-//			this.virtualInfo.fromJSONObject(jsonPurchasebleItem);
-//		}
+		this.marketInfo.fromJSONObject(jsonPurchasebleItem);
 	}
 }
 
@@ -468,11 +421,15 @@ public class SoomlaEditorData
 	private void InitObjects()	
 	{
 		newGood = new ZFGood();
+
 		goods = new List<ZFGood> ();
 		singleUseGoodsIDs = new List<string> ();
 		singleUseGoodsAmounts = new List<string> ();
+
 		newCurrency = new ZFCurrency ();
-		currencies = new List<ZFCurrency> ();
+		newCurrency.name = "Currency Name";
+        
+        currencies = new List<ZFCurrency> ();
 		newCurrencyPack = new ZFCurrencyPack ();
 		currencyPacks = new List<ZFCurrencyPack> ();
 		newCategory = new ZFCategory ();
@@ -486,7 +443,20 @@ public class SoomlaEditorData
 		goods.Add(good);
 	}
 
-	public bool isUniqueGood (ZFGood good)
+	public void AddCurrency() {
+        ZFCurrency currency = new ZFCurrency(newCurrency);
+		currency.ID = "currency_" + (currencies.Count + 1);
+		currencies.Add(currency);
+	}
+
+	public void AddCurrencyPack() {
+        ZFCurrencyPack currencyPack = new ZFCurrencyPack(newCurrencyPack);
+		currencyPack.ID = "currencypack_" + (currencyPacks.Count + 1);
+		currencyPacks.Add (new ZFCurrencyPack(currencyPack));
+	}
+    
+    
+    public bool isUniqueGood (ZFGood good)
 	{
 		for (int i = 0; i < this.goods.Count; i++) 
 		{
@@ -569,7 +539,6 @@ public class SoomlaEditorData
 			return;
 		}
 		JSONObject json = new JSONObject (jsonString);
-		Debug.Log (json.ToString ());
 
 		this.ParseJSONObject (json);
 	}
@@ -656,7 +625,6 @@ public class SoomlaEditorData
 		{
 			sw.Write(stringJSON);
 		}
-		Debug.Log("Write to JSON");
 	}
 
 	public JSONObject toJSONObject()
@@ -738,168 +706,218 @@ public class SoomlaEditorData
 		}
 	}
 
-	public void generateSoomlaWorkFlow()
-	{
+    public void generateSoomlaAssets()
+    {
+        string allVariables = "";
+        
+        SoomlaScriptBuilder builder = new SoomlaScriptBuilder();
+		builder.AppendLine("using UnityEngine;");
+		builder.AppendLine("using System.Collections;");
+		builder.AppendLine("using System.Collections.Generic;");
+		builder.AppendLine("using Soomla.Store;");
 
-		//beginning creating script (1)
-		string strLibraries = "using UnityEngine;\nusing System.Collections;\nusing System.Collections.Generic;\nusing Soomla.Store;\n\n";
-		string strCreatingClass = "namespace YourAppNamespace {\n\n\tpublic class SoomlaAssets : IStoreAssets\t{\n\n";
+		builder.AppendLine("public class SoomlaAssets : IStoreAssets {");
+		builder.IndentLevel++;
 
-		//ending creating script()
-		string closeScript = "\t}\n}";
-		string allVariables = "";
-		//making variables (2)
-		List<string> variablesStr = new List<string>();	
-		for (int i = 0; i < currencies.Count; i++) {
-			string item_id = currencies[i].ID.ToUpper() + "_ITEM_ID = \"" + currencies[i].ID + "\";\n\n";
-			string str = "\t\tpublic const string " + item_id;
+		builder.AppendLine();
+        for (int i = 0; i < currencies.Count; i++) {
 			allVariables += currencies[i].ID.ToUpper() + "_ITEM_ID, ";
-			variablesStr.Add(str);
+			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", currencies[i].ID.ToUpper(), currencies[i].ID));
+			builder.AppendLine();
 		}
+        
+		builder.AppendLine();
+        for (int i = 0; i < currencyPacks.Count; i++) {
+			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", currencyPacks[i].ID.ToUpper(), currencyPacks[i].ID));
+			declareProductId(builder, currencyPacks[i].ID, currencyPacks[i].marketInfo);
 
-		for (int i = 0; i < currencyPacks.Count; i++) {
-			string item_id = currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID = \"" + currencyPacks[i].ID + "\";\n\n";
-			string str = "\t\tpublic const string " + item_id;
-			allVariables += currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, ";
-			variablesStr.Add(str);
+			allVariables += currencyPacks[i].ID.ToUpper() + "_ITEM_ID, ";
+			builder.AppendLine();
 		}
-
-		for (int i = 0; i < goods.Count; i++) {
-			string itemOrProduct = "";
-			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market)
-				itemOrProduct = "_PRODUCT_ID";
-			else
-				itemOrProduct = "_ITEM_ID";
-			string item_id = goods[i].ID.ToUpper() + itemOrProduct + " = \"" + goods[i].ID + "\";\n\n";
-			string str = "\t\tpublic const string " + item_id;
-			allVariables += goods[i].ID.ToUpper() + itemOrProduct + ", ";
-			variablesStr.Add(str);
+        
+        builder.AppendLine();
+        for (int i = 0; i < goods.Count; i++) {
+			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", goods[i].ID.ToUpper(), goods[i].ID));
+			if (goods[i].typePurchase == ZFGood.PurchaseInfo.Market) {
+				declareProductId(builder, goods[i].ID, goods[i].marketInfo);
+            }
+			allVariables += goods[i].ID.ToUpper() + "_ITEM_ID, ";
+			builder.AppendLine();
 		}
-
-		List<string> constructorsStr = new List<string> ();
-		//creating constructors for each soomla object
+        
+        builder.AppendLine();
+        
+		//create constructors for each soomla object
+		//	Virtual Currencies
 		for (int i = 0; i < currencies.Count; i++) {
-			string constructor = currencies[i].ID.ToUpper() + " = new VirtualCurrency(\n" +
-				"\t\t\t\"" + currencies[i].name + "\",\n" +
-				"\t\t\t\"\",\n\t\t\t" +
-					currencies[i].ID.ToUpper() + "_ITEM_ID\n" +
-					"\t\t);\n\n";
-			string str = "\t\tpublic static VirtualCurrency " + constructor;
-			constructorsStr.Add(str);
-		}
-
+			builder.AppendLine("public static VirtualCurrency " + currencies[i].ID.ToUpper() + " = new VirtualCurrency(");
+			builder.IndentLevel ++;
+			builder.AppendLine("\"" + currencies[i].name + "\",");
+			builder.AppendLine("\"\",");
+			builder.AppendLine(currencies[i].ID.ToUpper() + "_ITEM_ID");
+			builder.IndentLevel --;
+			builder.AppendLine(");");
+			builder.AppendLine();
+        }
+        
+		//	Virtual Currency Packs
 		for (int i = 0; i < currencyPacks.Count; i++) {
-			string constructor = currencyPacks[i].ID.ToUpper() + " = new VirtualCurrencyPack(\n" +
-				"\t\t\t\"" + currencyPacks[i].name + "\",\n" +
-					"\t\t\t\"" + currencyPacks[i].description + "\",\n" +
-					"\t\t\t\"" + currencyPacks[i].ID + "\",\n" +
-					"\t\t\t" + currencyPacks[i].currency_amount +",\n" +
-					"\t\t\t" + currencyPacks[i].currency_itemId.ToUpper() + "_ITEM_ID,\n" +
-					"\t\t\tnew PurchaseWithMarket(" + currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, " + currencyPacks[i].marketInfo.price + ")\n" +
-					"\t\t);\n\n";
-			string str = "\t\tpublic static VirtualCurrencyPack " + constructor;
-			constructorsStr.Add(str);
-		}
-
+			builder.AppendLine("public static VirtualCurrencyPack " + currencyPacks[i].ID.ToUpper() + " = new VirtualCurrencyPack(");
+			builder.IndentLevel ++;
+			builder.AppendLine("\"" + currencyPacks[i].name + "\",");
+			builder.AppendLine("\"" + currencyPacks[i].description + "\",");
+			builder.AppendLine(currencyPacks[i].ID.ToUpper() + "_ITEM_ID,");
+			builder.AppendLine(currencyPacks[i].currency_amount + ",");
+			builder.AppendLine(currencyPacks[i].currency_itemId.ToUpper() + "_ITEM_ID,");
+			builder.AppendLine("new PurchaseWithMarket(" + currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, " + currencyPacks[i].marketInfo.price + ")");
+			builder.IndentLevel --;
+			builder.AppendLine(");");
+            builder.AppendLine();
+        }
+        
+		//	Virtual Goods
 		for (int i = 0; i < goods.Count; i++) { 
-			string initMethod = "";
-			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market)
-				initMethod = "new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")";
-			else
-				initMethod = "new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")";
+			builder.AppendLine(string.Format("public static VirtualGood {0} = new {1}(", goods[i].ID.ToUpper(), goods[i].goodType));
+           	builder.IndentLevel ++;
 
-			string equipModel = "";
-			if(goods[i].goodType == ZFGood.GoodType.EquippableVG)
-				equipModel = "\t\t\tEquippableVG.EquippingModel.LOCAL,\n";
-			else
-				equipModel = "";
-			
-			string constructor;
 
-			if (goods[i].goodType == ZFGood.GoodType.SingleUsePackVG)
-			{
-				constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
-					"\t\t\t\"" + goods[i].good_itemId + "\",\n" +
-					"\t\t\t" + goods[i].good_amount + ",\n" +
-					"\t\t\t\"" + goods[i].name + "\",\n" +
-						"\t\t\t\"" + goods[i].description + "\",\n" +
-						"\t\t\t\"" + goods[i].ID + "\",\n" +
-						"\t\t\t" + initMethod + "\n" +
-						"\t\t);\n\n";
+			if (goods[i].goodType == ZFGood.GoodType.SingleUsePackVG) {
+				builder.AppendLine("\"" + goods[i].good_itemId + "\",");
+				builder.AppendLine(goods[i].good_amount + ",");
+			} else if (goods[i].goodType == ZFGood.GoodType.EquippableVG) {
+				builder.AppendLine("EquippableVG.EquippingModel.LOCAL,");
 			}
-			else
-			{
-				constructor = goods[i].ID.ToUpper() + " = new " + goods[i].goodType + "(\n" + equipModel +
-					"\t\t\t\"" + goods[i].name + "\",\n" +
-						"\t\t\t\"" + goods[i].description + "\",\n" +
-						"\t\t\t\"" + goods[i].ID + "\",\n" +
-						"\t\t\t" + initMethod + "\n" +
-						"\t\t);\n\n";
-			}
-			string str = "\t\tpublic static VirtualGood " + constructor;
-			constructorsStr.Add(str);
+                
+			builder.AppendLine("\"" + goods[i].name + "\",");
+			builder.AppendLine("\"" + goods[i].description + "\",");
+			builder.AppendLine(goods[i].ID.ToUpper() + "_ITEM_ID,");
+
+			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market) {
+				builder.AppendLine("new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")");
+			} else {
+				builder.AppendLine("new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")");
+            }
+            builder.IndentLevel --;
+            builder.AppendLine(");");
+			builder.AppendLine();
 		}
-
+       
+		builder.AppendLine();
+        
+        // add GENERAL_CATEGORY
+		// remove last ", "
 		allVariables = allVariables.Remove (allVariables.Length - 2, 2);
-		string addGeneralCategory = "\t\tpublic static VirtualCategory GENERAL_CATEGORY = new VirtualCategory(\n" +
-						"\t\t\t\"General\", new List<string>(new string[] {" + allVariables + "})\n\t\t);\n\n";
+		builder.AppendLine("public static VirtualCategory GENERAL_CATEGORY = new VirtualCategory(");
+		builder.IndentLevel ++;
+		builder.AppendLine("\"General\", new List<string>(new string[] {" + allVariables + "})");
+        builder.IndentLevel --;
+		builder.AppendLine(");");
+		builder.AppendLine();
+
 
 		//get() methods for Soomla objects
-		string getVersionMethod = "\t\tpublic int GetVersion()  {\n\t\t\treturn 0;\n\t\t}\n\n";
+		// implement GetVersion
+		builder.AppendLine("public int GetVersion() {");
+		builder.IndentLevel ++;
+		builder.AppendLine("return 0;");
+        builder.IndentLevel --;
+		builder.AppendLine("}");
+        builder.AppendLine();
 
+		// implement GetCurrencies
 		string currenciesSequence = "";
 		for (int i = 0; i < currencies.Count; i++) {
 			currenciesSequence += currencies[i].ID.ToUpper();
-			if(i + 1 != currencies.Count)
+			if (i != currencies.Count - 1) {
 				currenciesSequence += ", ";
+            }
 		}
-		string getCurrenciesMethod = "\t\tpublic VirtualCurrency[] GetCurrencies()\t{\n" +
-			"\t\t\treturn new VirtualCurrency[]{" + currenciesSequence + "};\n\t\t}\n\n";
+		builder.AppendLine("public VirtualCurrency[] GetCurrencies() {");
+		builder.IndentLevel ++;
+		builder.AppendLine("return new VirtualCurrency[]{" + currenciesSequence + "};");
+		builder.IndentLevel --;
+		builder.AppendLine("}");
+		builder.AppendLine();
 
+		// implement GetCurrencyPacks
 		string currencyPacksSequence = "";
 		for (int i = 0; i < currencyPacks.Count; i++) {
 			currencyPacksSequence += currencyPacks[i].ID.ToUpper();
-			if(i + 1 != currencyPacks.Count)
+			if (i != currencyPacks.Count - 1) {
 				currencyPacksSequence += ", ";
+			}
 		}
-		string getCurrencyPacksMethod = "\t\tpublic VirtualCurrencyPack[] GetCurrencyPacks()\t{\n" +
-			"\t\t\treturn new VirtualCurrencyPack[]{" + currencyPacksSequence + "};\n\t\t}\n\n";
-
+		builder.AppendLine("public VirtualCurrencyPack[] GetCurrencyPacks() {");
+		builder.IndentLevel ++;
+		builder.AppendLine("return new VirtualCurrencyPack[]{" + currencyPacksSequence + "};");
+		builder.IndentLevel --;
+        builder.AppendLine("}");
+        builder.AppendLine();
+        
+		// implement GetGoods
 		string goodsSequence = "";
 		for (int i = 0; i < goods.Count; i++) {
 			goodsSequence += goods[i].ID.ToUpper();
-			if(i + 1 != goods.Count)
+			if (i != goods.Count - 1) {
 				goodsSequence += ", ";
+			}
 		}
-		string getGoodsMethod = "\t\tpublic VirtualGood[] GetGoods()\t{\n" +
-						"\t\t\treturn new VirtualGood[]{" + goodsSequence + "};\n\t\t}\n\n";
+		builder.AppendLine("public VirtualGood[] GetGoods() {");
+		builder.IndentLevel ++;
+		builder.AppendLine("return new VirtualGood[]{" + goodsSequence + "};");
+		builder.IndentLevel --;
+        builder.AppendLine("}");
+        builder.AppendLine();
 
-		string getCategories = "\t\tpublic VirtualCategory[] GetCategories()\t{\n" +
-						"\t\t\treturn new VirtualCategory[]{GENERAL_CATEGORY};\n\t\t}\n\n";
+		// implement GetCategories
+		builder.AppendLine("public VirtualCategory[] GetCategories() {");
+		builder.IndentLevel ++;
+		builder.AppendLine("return new VirtualCategory[]{GENERAL_CATEGORY};");
+		builder.IndentLevel --;
+        builder.AppendLine("}");
+        builder.AppendLine();
+        
+
+        // end class
+		builder.IndentLevel--;
+		builder.AppendLine("}");
 
 		List<string> productIdentifiers = new List<string> ();
 
 		string path = @"Assets/SoomlaAssets.cs";
 		using (StreamWriter sw = File.CreateText(path))
 		{
-			sw.Write(strLibraries);
-			sw.Write(strCreatingClass);
-			for (int i = 0; i < variablesStr.Count; i++)
-			{
-				sw.Write(variablesStr[i]);
-			}
-			for (int i = 0; i < constructorsStr.Count; i++)
-			{
-				sw.Write(constructorsStr[i]);
-			}
-			sw.Write(addGeneralCategory);			//it's optional yet
-
-			sw.Write(getVersionMethod);
-			sw.Write(getCurrenciesMethod);
-			sw.Write(getCurrencyPacksMethod);
-			sw.Write(getGoodsMethod);
-			sw.Write(getCategories);				//it's optional yet
-			sw.Write(closeScript);
+			sw.Write(builder.ToString());
 		}
 	}
+
+	private void declareProductId(SoomlaScriptBuilder builder, string id, MarketInfo marketInfo) {
+		bool hasOverrides = false;
+		// for iOS
+		if (marketInfo.useIos) {
+			builder.AppendLine("#if UNITY_IOS");
+			builder.AppendLine(string.Format("public const string {0}_PRODUCT_ID = \"{1}\";", id.ToUpper(), marketInfo.iosId));
+			hasOverrides = true;
+		}
+		// for Android
+		if (marketInfo.useAndroid) {
+			if (hasOverrides) {
+				builder.AppendLine("#elif UNITY_ANDROID");
+			} else {
+				builder.AppendLine("#if UNITY_ANDROID");
+			}
+			builder.AppendLine(string.Format("public const string {0}_PRODUCT_ID = \"{1}\";", id.ToUpper(), marketInfo.androidId));
+			hasOverrides = true;
+		}
+		// default value
+		if (hasOverrides) {
+			builder.AppendLine("#else");
+		}
+		builder.AppendLine(string.Format("public const string {0}_PRODUCT_ID = \"{1}\";", id.ToUpper(), marketInfo.productId));
+        if (hasOverrides) {
+            builder.AppendLine("#endif");
+        }
+    }
+    
+    
 }
