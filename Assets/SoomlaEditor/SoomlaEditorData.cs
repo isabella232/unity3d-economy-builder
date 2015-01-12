@@ -774,6 +774,18 @@ public class SoomlaEditorData
 			string str = "\t\tpublic const string " + item_id;
 			allVariables += goods[i].ID.ToUpper() + itemOrProduct + ", ";
 			variablesStr.Add(str);
+
+			string productIdNameVariable = goods[i].ID + "_productId";
+			string productIdForItem = "\t\tpublic string " + productIdNameVariable + " = \"productId\";\n";
+			
+			string redefinitionPlatform = "\t\t#if UNITY_IOS\n\t\t\t" + productIdNameVariable + " = \"" + goods[i].marketInfo.iosId + "\";\n" +
+				"\t\t#elif UNITY_ANDROID\n\t\t\t" + productIdNameVariable + " = \"" + goods[i].marketInfo.androidId + "\";\n" +
+					"\t\t#elif UNITY_AMAZON\n\t\t\t" + productIdNameVariable + " = \"" + goods[i].marketInfo.amazonId + "\";\n" +
+					"\t\t#elif UNITY_WP8\n\t\t\t" + productIdNameVariable + " = \"" + goods[i].marketInfo.windowsPhone8Id + "\";\n" +
+					"\t\t#endif\n\n";
+			
+			variablesStr.Add(productIdForItem);
+			variablesStr.Add(redefinitionPlatform);
 		}
 
 		List<string> constructorsStr = new List<string> ();
