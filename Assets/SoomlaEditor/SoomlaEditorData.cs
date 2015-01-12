@@ -5,13 +5,14 @@ using System.IO;
 
 public class MarketInfo
 {
-	public bool platformOverridesEnabled = false;
+
+	public string productId = "productId";
 
 	public bool useIos = false;
-	public string iosId = "";
+	public string iosId = "iosProductId";
 	
 	public bool useAndroid = false;
-	public string androidId = "";
+	public string androidId = "androidProductId";
 	
 	public bool useAmazon = false;
 	public string amazonId = "";
@@ -21,7 +22,7 @@ public class MarketInfo
 	
 	public PurchaseType type = null;
 	
-	public string price = "0.0";
+	public float price = 0.99f;
 	
 	enum Consumable
 	{
@@ -34,6 +35,7 @@ public class MarketInfo
 	
 	public MarketInfo(MarketInfo marketInfo)
 	{
+		this.productId = marketInfo.productId;
 		this.useIos = marketInfo.useIos;
 		this.iosId = marketInfo.iosId;
 		this.useAndroid = marketInfo.useAndroid;
@@ -43,28 +45,13 @@ public class MarketInfo
 		this.useWindowsPhone8 = marketInfo.useWindowsPhone8;
 		this.windowsPhone8Id = marketInfo.windowsPhone8Id;
 		this.price = marketInfo.price;
-		this.platformOverridesEnabled = useAndroid || useAndroid || useAmazon || useWindowsPhone8;
 	}
 	
 	public MarketInfo() {}
 
-	public void ClearFields()
-	{
-		this.useIos = false;
-		this.iosId = "";
-		this.useAndroid = false;
-		this.androidId = "";
-		this.useAmazon = false;
-		this.amazonId = "";
-		this.useWindowsPhone8 = false;
-		this.windowsPhone8Id = "";
-		this.price = "0.0";
-		this.platformOverridesEnabled = false;
-	}
-
 	public bool ifMarketPurchaseFull()
 	{
-		if ((this.iosId != "" || this.androidId != "" || this.amazonId != "" || this.windowsPhone8Id != "") && this.price != "") {
+		if ((this.iosId != "" || this.androidId != "" || this.amazonId != "" || this.windowsPhone8Id != "") && this.price != 0.0f) {
 			return true;
 		} else {
 			return false;
@@ -76,23 +63,23 @@ public class MarketInfo
 		JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
 		JSONObject marketItem = new JSONObject (JSONObject.Type.OBJECT);
 	
-		if (this.platformOverridesEnabled) {
-			if (this.useIos)
-			{
-				marketItem.AddField ("iosId", this.iosId);
-			}
-			if (this.useAndroid) 
-			{
-				marketItem.AddField("androidId", this.androidId);
-			}
-			if (this.useAmazon)
-			{
-				marketItem.AddField("amazonId", this.amazonId);
-			}
-			if (this.useWindowsPhone8)
-			{
-				marketItem.AddField("windowsPhone8Id", this.windowsPhone8Id);
-			}
+		marketItem.AddField ("productId", this.productId);
+        
+		if (this.useIos)
+		{
+			marketItem.AddField ("iosId", this.iosId);
+		}
+		if (this.useAndroid) 
+		{
+			marketItem.AddField("androidId", this.androidId);
+		}
+		if (this.useAmazon)
+		{
+			marketItem.AddField("amazonId", this.amazonId);
+		}
+		if (this.useWindowsPhone8)
+		{
+			marketItem.AddField("windowsPhone8Id", this.windowsPhone8Id);
 		}
 		marketItem.AddField ("price", this.price);
 		marketItem.AddField ("consumable", (int)this.consumable);
@@ -106,6 +93,14 @@ public class MarketInfo
 	public void fromJSONObject(JSONObject json)
 	{
 		JSONObject marketItem = json.GetField("marketItem");
+
+		JSONObject jsonProductId = marketItem.GetField("productId");
+		if (jsonProductId != null) {
+			this.productId = marketItem.GetField("productId").str;
+		} else {
+			this.productId = "";
+		}
+        
 		JSONObject jsonIosId = marketItem.GetField ("iosId");
 
 		this.useIos = (jsonIosId != null);
@@ -135,9 +130,7 @@ public class MarketInfo
 			this.windowsPhone8Id = jsonWindowPhone8Id.str;
 		}
 		
-		this.platformOverridesEnabled = useAndroid || useAndroid || useAmazon || useWindowsPhone8;
-
-		this.price = marketItem.GetField ("price").str;
+		this.price = marketItem.GetField ("price").n;
 		this.consumable = (Consumable)int.Parse(marketItem.GetField("consumable").ToString());
 	}
 }
@@ -145,7 +138,7 @@ public class MarketInfo
 public class VirtualInfo
 {
 	public string pvi_itemId = "";
-	public string pvi_amount = "0";
+	public int pvi_amount = 10;
 	
 	public VirtualInfo(VirtualInfo virtualInfo)
 	{
@@ -155,15 +148,9 @@ public class VirtualInfo
 	
 	public VirtualInfo() { }
 	
-	public void ClearFields()
-	{
-		this.pvi_itemId = "";
-		this.pvi_amount = "0";
-	}
-	
 	public bool ifVirtualPurchaseFull()
 	{
-		if (pvi_itemId != "" && this.pvi_amount != "")
+		if (pvi_itemId != "" && this.pvi_amount != 0	)
 			return true;
 		else
 			return false;
@@ -182,19 +169,21 @@ public class VirtualInfo
 	public void fromJSONObject(JSONObject json)
 	{
 		this.pvi_itemId = json.GetField ("pvi_itemId").str;
-		this.pvi_amount = json.GetField ("pvi_amount").str;
+		this.pvi_amount = (int) json.GetField ("pvi_amount").n;
 	}
 }
 public class ZFGood	
 {
 	public string ID = "";
-	public string name = "";
-	public string description = "";
+	public string name = "Virtual Good Name";
+	public string description = "Virtual Good Description";
 	public MarketInfo marketInfo = null;
 	public VirtualInfo virtualInfo = null;
 	// for pack
 	public string good_itemId = "";
-	public string good_amount = "0";
+	public int good_amount = 10;
+
+	public bool render = true;
 
 	public enum GoodType
 	{
@@ -222,19 +211,6 @@ public class ZFGood
 		this.marketInfo = new MarketInfo(goodInfo.marketInfo);
 		this.virtualInfo = new VirtualInfo(goodInfo.virtualInfo);
 		this.goodType = goodInfo.goodType;
-	}
-
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
-		this.description = "";
-		this.typePurchase = PurchaseInfo.Market;
-		this.marketInfo.ClearFields();
-		this.virtualInfo.ClearFields();
-		this.goodType = GoodType.LifetimeVG;
-		this.good_itemId = "";
-		this.good_amount = "0";
 	}
 
 	public bool ifGoodFull()
@@ -305,7 +281,7 @@ public class ZFGood
 		if (this.goodType == ZFGood.GoodType.SingleUsePackVG)
 		{
 			this.good_itemId = json.GetField("good_itemId").str;
-			this.good_amount = json.GetField("good_amount").str;
+			this.good_amount = (int)json.GetField("good_amount").n;
 		}
 	}
 	
@@ -323,17 +299,13 @@ public class ZFCurrency
 	public string ID = "currency_";
 	public string name = "";
 
+	public bool render = true;
+
 	public ZFCurrency() { }
 	public ZFCurrency(ZFCurrency currency)
 	{
 		this.ID = currency.ID;
 		this.name = currency.name;
-	}
-
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
 	}
 
 	public bool isCurrencyFull()
@@ -363,13 +335,14 @@ public class ZFCurrency
 public class ZFCurrencyPack	
 {
 	public string ID = "currencypack_";
-	public string name = "";
-	public string description = "";
+	public string name = "Currency Pack Name";
+	public string description = "Currency Pack Description";
 	public string currency_itemId = "";
-	public string currency_amount = "";
+	public int currency_amount = 10;
 	public MarketInfo marketInfo = null;
 	
-	
+	public bool render = true;
+    
 	public ZFCurrencyPack()
 	{
 		this.marketInfo = new MarketInfo();
@@ -385,19 +358,9 @@ public class ZFCurrencyPack
 		this.marketInfo = new MarketInfo(currencyPack.marketInfo);
 	}
 	
-	public void ClearFields()
-	{
-		this.ID = "";
-		this.name = "";
-		this.description = "";
-		this.currency_itemId = "";
-		this.currency_amount = "";
-		this.marketInfo.ClearFields();
-	}
-
 	public bool isCurrencyPackFull()
 	{
-		if (this.ID == "" || this.name == "" || this.currency_itemId == "" || this.currency_amount == "") {
+		if (this.ID == "" || this.name == "" || this.currency_itemId == "" || this.currency_amount == 0) {
 			return false;
 		} else {
 			return true;
@@ -423,19 +386,9 @@ public class ZFCurrencyPack
 		this.name = json.GetField("name").str;
 		this.description = json.GetField("description").str;
 		this.currency_itemId = json.GetField ("currency_itemId").str;
-		this.currency_amount = json.GetField ("currency_amount").str;
+		this.currency_amount = (int)json.GetField ("currency_amount").n;
 		JSONObject jsonPurchasebleItem = json.GetField ("purchasableItem");
-//		string purchaseTypeString = jsonPurchasebleItem.GetField ("purchaseType").str;
-//		if (string.Equals(purchaseTypeString, "market"))
-//		{
-//			this.typePurchase = PurchaseInfo.PurchaseWithMarket;
-			this.marketInfo.fromJSONObject(jsonPurchasebleItem);
-//		}
-//		else
-//		{
-//			this.typePurchase = PurchaseInfo.PurchaseWithVirtualItem;
-//			this.virtualInfo.fromJSONObject(jsonPurchasebleItem);
-//		}
+		this.marketInfo.fromJSONObject(jsonPurchasebleItem);
 	}
 }
 
@@ -468,11 +421,15 @@ public class SoomlaEditorData
 	private void InitObjects()	
 	{
 		newGood = new ZFGood();
+
 		goods = new List<ZFGood> ();
 		singleUseGoodsIDs = new List<string> ();
 		singleUseGoodsAmounts = new List<string> ();
+
 		newCurrency = new ZFCurrency ();
-		currencies = new List<ZFCurrency> ();
+		newCurrency.name = "Currency Name";
+        
+        currencies = new List<ZFCurrency> ();
 		newCurrencyPack = new ZFCurrencyPack ();
 		currencyPacks = new List<ZFCurrencyPack> ();
 		newCategory = new ZFCategory ();
@@ -486,7 +443,20 @@ public class SoomlaEditorData
 		goods.Add(good);
 	}
 
-	public bool isUniqueGood (ZFGood good)
+	public void AddCurrency() {
+        ZFCurrency currency = new ZFCurrency(newCurrency);
+		currency.ID = "currency_" + (currencies.Count + 1);
+		currencies.Add(currency);
+	}
+
+	public void AddCurrencyPack() {
+        ZFCurrencyPack currencyPack = new ZFCurrencyPack(newCurrencyPack);
+		currencyPack.ID = "currencypack_" + (currencyPacks.Count + 1);
+		currencyPacks.Add (new ZFCurrencyPack(currencyPack));
+	}
+    
+    
+    public bool isUniqueGood (ZFGood good)
 	{
 		for (int i = 0; i < this.goods.Count; i++) 
 		{
