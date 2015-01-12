@@ -425,7 +425,6 @@ public class SoomlaEditorData
 	public ZFGood newGood;
 	public List<ZFGood> goods;
 	public List<string> singleUseGoodsIDs;
-	public List<string> singleUseGoodsAmounts; 
 
 	public ZFCurrency newCurrency;
 	public List<ZFCurrency> currencies;
@@ -447,7 +446,6 @@ public class SoomlaEditorData
 
 		goods = new List<ZFGood> ();
 		singleUseGoodsIDs = new List<string> ();
-		singleUseGoodsAmounts = new List<string> ();
 
 		newCurrency = new ZFCurrency ();
 		newCurrency.name = "Currency Name";
@@ -462,20 +460,35 @@ public class SoomlaEditorData
 	public void AddGood(ZFGood.GoodType goodType) {
 		ZFGood good = new ZFGood(newGood);
 		good.goodType = goodType;
-		good.ID = "item_" + (goods.Count + 1);
+		int goodItemNumber = goods.Count + 1;
+		good.ID = "item_" + goodItemNumber;
 		goods.Add(good);
+		while (!areUniqueGoods()) {
+			goodItemNumber++;
+			good.ID = "item_" + goodItemNumber;
+		}
 	}
 
 	public void AddCurrency() {
         ZFCurrency currency = new ZFCurrency(newCurrency);
-		currency.ID = "currency_" + (currencies.Count + 1);
+		int currencyItemNumber = currencies.Count + 1;
+		currency.ID = "currency_" + currencyItemNumber;
 		currencies.Add(currency);
+		while (!areUniqueCurrencies()) {
+			currencyItemNumber++;
+			currency.ID = "currency_" + currencyItemNumber;
+		}
 	}
 
 	public void AddCurrencyPack() {
         ZFCurrencyPack currencyPack = new ZFCurrencyPack(newCurrencyPack);
-		currencyPack.ID = "currencypack_" + (currencyPacks.Count + 1);
-		currencyPacks.Add (new ZFCurrencyPack(currencyPack));
+		int currencyPackItemNumber = currencyPacks.Count + 1;
+		currencyPack.ID = "currencypack_" + currencyPackItemNumber;
+		currencyPacks.Add (currencyPack);
+		while (!areUniqueCurrencyPacks()) {
+			currencyPackItemNumber++;
+			currencyPack.ID = "currencypack_" + currencyPackItemNumber;
+		}
 	}
     
     
@@ -730,23 +743,21 @@ public class SoomlaEditorData
 		return json;
 	}
 
-	public void collectSingleUseItems()
+	public void updateSingleUseItems()
 	{
 		singleUseGoodsIDs.Clear ();
-		singleUseGoodsAmounts.Clear ();
 		for (int i = 0; i < goods.Count; i++) {
 			if(goods[i].goodType == ZFGood.GoodType.SingleUseVG)
 			{
 				singleUseGoodsIDs.Add(goods[i].ID);
 				string str = "0";
-				singleUseGoodsAmounts.Add(str);
 			}
 		}
 	}
 
     public void generateSoomlaAssets()
     {
-        string allVariables = "";
+        string goodsVariables = "";
         
         SoomlaScriptBuilder builder = new SoomlaScriptBuilder();
 		builder.AppendLine("using UnityEngine;");
@@ -759,7 +770,6 @@ public class SoomlaEditorData
 
 		builder.AppendLine();
         for (int i = 0; i < currencies.Count; i++) {
-			allVariables += currencies[i].ID.ToUpper() + "_ITEM_ID, ";
 			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", currencies[i].ID.ToUpper(), currencies[i].ID));
 			builder.AppendLine();
 		}
@@ -769,7 +779,6 @@ public class SoomlaEditorData
 			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", currencyPacks[i].ID.ToUpper(), currencyPacks[i].ID));
 			declareProductId(builder, currencyPacks[i].ID, currencyPacks[i].marketInfo);
 
-			allVariables += currencyPacks[i].ID.ToUpper() + "_ITEM_ID, ";
 			builder.AppendLine();
 		}
         
@@ -779,7 +788,7 @@ public class SoomlaEditorData
 			if (goods[i].typePurchase == ZFGood.PurchaseInfo.Market) {
 				declareProductId(builder, goods[i].ID, goods[i].marketInfo);
             }
-			allVariables += goods[i].ID.ToUpper() + "_ITEM_ID, ";
+			goodsVariables += goods[i].ID.ToUpper() + "_ITEM_ID, ";
 			builder.AppendLine();
 		}
         
@@ -844,10 +853,10 @@ public class SoomlaEditorData
         
         // add GENERAL_CATEGORY
 		// remove last ", "
-		allVariables = allVariables.Remove (allVariables.Length - 2, 2);
+		goodsVariables = goodsVariables.Remove (goodsVariables.Length - 2, 2);
 		builder.AppendLine("public static VirtualCategory GENERAL_CATEGORY = new VirtualCategory(");
 		builder.IndentLevel ++;
-		builder.AppendLine("\"General\", new List<string>(new string[] {" + allVariables + "})");
+		builder.AppendLine("\"General\", new List<string>(new string[] {" + goodsVariables + "})");
         builder.IndentLevel --;
 		builder.AppendLine(");");
 		builder.AppendLine();

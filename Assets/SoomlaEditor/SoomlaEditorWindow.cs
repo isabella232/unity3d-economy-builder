@@ -35,7 +35,7 @@ public class SoomlaEditorWindow : EditorWindow
 	{
 		editorData = new SoomlaEditorData ();
 		editorData.ReadFromJSONFile ();
-		editorData.collectSingleUseItems();
+		editorData.updateSingleUseItems();
 		inited = true;
 	}
 
@@ -76,7 +76,10 @@ public class SoomlaEditorWindow : EditorWindow
 			}
 		}
 
-		this.ShowData();
+		if(editorData != null)
+			this.ShowData();
+		else
+			InitSoomlaEditorData();
 
 	}
 
@@ -123,7 +126,7 @@ public class SoomlaEditorWindow : EditorWindow
 				editorData.AddGood(ZFGood.GoodType.SingleUsePackVG);
 			}
 
-			editorData.collectSingleUseItems();
+			editorData.updateSingleUseItems();
 
 			goodTypeIndex = 0;
 		}
@@ -209,6 +212,7 @@ public class SoomlaEditorWindow : EditorWindow
 			EditorGUI.indentLevel--;
             
             if (good.goodType == ZFGood.GoodType.SingleUsePackVG) {
+				editorData.updateSingleUseItems();
 				if (editorData.singleUseGoodsIDs.Count > 0) {
 					int indexInArray = 0;
 					if (editorData.singleUseGoodsIDs.Count != 0)
