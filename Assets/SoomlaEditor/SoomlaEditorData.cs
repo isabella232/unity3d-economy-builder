@@ -877,6 +877,8 @@ public class SoomlaEditorData
 		string getCategories = "\t\tpublic VirtualCategory[] GetCategories()\t{\n" +
 						"\t\t\treturn new VirtualCategory[]{GENERAL_CATEGORY};\n\t\t}\n\n";
 
+		List<string> productIdentifiers = new List<string> ();
+
 		string path = @"Assets/SoomlaAssets.cs";
 		using (StreamWriter sw = File.CreateText(path))
 		{
