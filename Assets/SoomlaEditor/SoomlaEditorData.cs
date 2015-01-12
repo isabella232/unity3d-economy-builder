@@ -394,6 +394,29 @@ public class ZFCurrencyPack
 
 public class SoomlaEditorData 
 {
+	private bool changes = true;
+
+	public void changed()	{
+				changes = true;
+		}
+
+	public bool isChangedSomething()	{
+				return changes;
+		}
+
+	public void changesWereApproved()	{
+				changes = false;
+		}
+
+	private string sameItemsBuffer = "";
+	private void rememberSameItems(string objectType, string str1, string str2)	{
+		sameItemsBuffer = objectType + " have same id's:\n";
+		sameItemsBuffer += str1 + "\n" + str2;
+	}
+	public string getResponseAboutSameItems()	{
+				return sameItemsBuffer;
+		}
+
 	public SoomlaEditorData()
 	{
 		this.InitObjects ();
@@ -456,43 +479,58 @@ public class SoomlaEditorData
 	}
     
     
-    public bool isUniqueGood (ZFGood good)
+    public bool areUniqueGoods ()
 	{
 		for (int i = 0; i < this.goods.Count; i++) 
 		{
-			ZFGood currentGood = this.goods[i];
-			
-			if(currentGood.ID == good.ID || currentGood.name == good.name)
+			ZFGood good1 = this.goods[i];
+
+			for (int j = 0 ; j < this.goods.Count; j++)
 			{
-				return false;
+				ZFGood good2 = this.goods[j];
+				if(good1.ID == good2.ID && i != j)
+				{
+					rememberSameItems("Goods", good1.name, good2.name);
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	public bool isUniqueCurrency(ZFCurrency currency)
+	public bool areUniqueCurrencies()
 	{
 		for (int i = 0; i < this.currencies.Count; i++)	
 		{
-			ZFCurrency currentCurrency = this.currencies[i];
+			ZFCurrency currency1 = this.currencies[i];
 
-			if(currentCurrency.ID == currency.ID || currentCurrency.name == currency.name)
+			for (int j = 0; j < this.currencies.Count; j++)
 			{
-				return false;
+				ZFCurrency currency2 = this.currencies[j];
+				if(currency1.ID == currency2.ID && i != j)
+				{
+					rememberSameItems("Currencies", currency1.name, currency2.name);
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	public bool isUniqueCurrencyPack(ZFCurrencyPack currencyPack)
+	public bool areUniqueCurrencyPacks()
 	{
 		for (int i = 0; i < this.currencyPacks.Count; i++) 
 		{
-			ZFCurrencyPack currentCurrencyPack = this.currencyPacks[i];
+			ZFCurrencyPack currencyPack1 = this.currencyPacks[i];
 
-			if(currentCurrencyPack.ID == currencyPack.ID || currentCurrencyPack.name == currencyPack.name)
+			for (int j = 0; j < this.currencyPacks.Count; j++)
 			{
-				return false;
+				ZFCurrencyPack currencyPack2 = this.currencyPacks[j];
+				if(currencyPack1.ID == currencyPack2.ID && i != j)
+				{
+					rememberSameItems("Currency Packs", currencyPack1.name, currencyPack2.name);
+					return false;
+				}
 			}
 		}
 		return true;

@@ -65,8 +65,15 @@ public class SoomlaEditorWindow : EditorWindow
 		EditorGUILayout.EndHorizontal();
 		if(GUILayout.Button("Generate"))
 		{
-			editorData.WriteToJSONFile(editorData.toJSONObject());
-			editorData.generateSoomlaAssets();
+			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
+			{
+				EditorUtility.DisplayDialog("ERROR", editorData.getResponseAboutSameItems(), "Ok");
+			}
+			else
+			{
+				editorData.WriteToJSONFile(editorData.toJSONObject());
+				editorData.generateSoomlaAssets();
+			}
 		}
 
 		this.ShowData();
