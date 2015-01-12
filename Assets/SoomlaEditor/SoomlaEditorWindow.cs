@@ -7,7 +7,6 @@ using Soomla.Store;
 public class SoomlaEditorWindow : EditorWindow 
 {
 
-	private int idForSinglePack = 0;
 	private Vector2 scrollPos = Vector2.zero;
 	private SoomlaEditorData editorData;
 	private bool inited = false;
@@ -67,7 +66,7 @@ public class SoomlaEditorWindow : EditorWindow
 		if(GUILayout.Button("Generate"))
 		{
 			editorData.WriteToJSONFile(editorData.toJSONObject());
-			editorData.generateSoomlaWorkFlow();
+			editorData.generateSoomlaAssets();
 		}
 
 		this.ShowData();
