@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿	using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Soomla.Store;
 
-public class SoomlaEditorWindow : EditorWindow 
+public class EconomyBuilder : EditorWindow 
 {
 
 	private Vector2 scrollPos = Vector2.zero;
@@ -19,15 +19,17 @@ public class SoomlaEditorWindow : EditorWindow
 		categories,
 	};
 
-	string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Upgradable", "Single Use Pack"};
+	//string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Upgradable", "Single Use Pack"};
+	//without upgradable
+	string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Single Use Pack"}; 
 	int goodTypeIndex = 0;
 	
 	private screens screenNumber = screens.goods;
 
-	[MenuItem ("Window/Soomla Editor Window")]
+	[MenuItem ("Window/Economy Builder")]
 	static void Init ()
 	{
-		SoomlaEditorWindow window = (SoomlaEditorWindow)EditorWindow.GetWindow (typeof (SoomlaEditorWindow));
+		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow (typeof (EconomyBuilder));
 		window.InitSoomlaEditorData ();
 	}
 
@@ -54,7 +56,7 @@ public class SoomlaEditorWindow : EditorWindow
 			if (GUILayout.Toggle(screenNumber == screens.currencies, "Currencies", EditorStyles.toolbarButton))
 				screenNumber = screens.currencies;
 			
-			if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currencies Packs", EditorStyles.toolbarButton))
+			if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currency Packs", EditorStyles.toolbarButton))
 				screenNumber = screens.currencyPacks;
 			
 //			if (GUILayout.Toggle(screenNumber == screens.categories, "Categories", EditorStyles.toolbarButton))
@@ -63,6 +65,7 @@ public class SoomlaEditorWindow : EditorWindow
 //			}
 		}
 		EditorGUILayout.EndHorizontal();
+		/*
 		if(GUILayout.Button("Generate"))
 		{
 			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
@@ -74,7 +77,7 @@ public class SoomlaEditorWindow : EditorWindow
 				editorData.WriteToJSONFile(editorData.toJSONObject());
 				editorData.generateSoomlaAssets();
 			}
-		}
+		}*/
 
 		if(editorData != null)
 			this.ShowData();
@@ -106,6 +109,7 @@ public class SoomlaEditorWindow : EditorWindow
 
 	void ShowGoods()
 	{
+		EditorGUILayout.BeginHorizontal ();
 		goodTypeIndex = EditorGUILayout.Popup(goodTypeIndex, goodTypeOptions, GUILayout.Width(100));
 
 		if (goodTypeIndex > 0)
@@ -119,10 +123,10 @@ public class SoomlaEditorWindow : EditorWindow
 			else if (goodTypeIndex == 3) {
 				editorData.AddGood(ZFGood.GoodType.EquippableVG);
 			}
-			else if (goodTypeIndex == 4) {
+			/*else if (goodTypeIndex == 4) {
 				editorData.AddGood(ZFGood.GoodType.UpgradeVG);
-			}
-			else if (goodTypeIndex == 5) {
+			}*/
+			else if (goodTypeIndex == 4) {
 				editorData.AddGood(ZFGood.GoodType.SingleUsePackVG);
 			}
 
@@ -130,7 +134,22 @@ public class SoomlaEditorWindow : EditorWindow
 
 			goodTypeIndex = 0;
 		}
-		
+
+		if(GUILayout.Button("Generate", GUILayout.Width(100), GUILayout.Height(15)))
+		{
+			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
+			{
+				EditorUtility.DisplayDialog("ERROR", editorData.getResponseAboutSameItems(), "Ok");
+			}
+			else
+			{
+				editorData.WriteToJSONFile(editorData.toJSONObject());
+				editorData.generateSoomlaAssets();
+				EditorUtility.DisplayDialog("", "File has been saved to path:/nAssets/SoomlaAssets.cs", "Ok");
+			}
+		}
+		EditorGUILayout.EndHorizontal ();
+
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
 
 		for (int i = 0; i < editorData.goods.Count; i++)
@@ -148,7 +167,8 @@ public class SoomlaEditorWindow : EditorWindow
 
 		EditorGUILayout.BeginHorizontal();
 		good.render = EditorGUILayout.Foldout(good.render, good.goodType.ToString() + "[" + good.ID + "]");
-		if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
+		GUIContent deleteButtonContent = new GUIContent ("X", "Press the button if you want to delete object");
+		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteGood(good);
 		}
 		EditorGUILayout.EndHorizontal();
