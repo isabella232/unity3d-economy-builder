@@ -21,12 +21,15 @@ public class EconomyBuilder : EditorWindow
 
 	//string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Upgradable", "Single Use Pack"};
 	//without upgradable
-	string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Single Use Pack"}; 
-	int goodTypeIndex = 0;
+	private string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Single Use Pack"}; 
+	private int goodTypeIndex = 0;
+
+	private string[] displayingModes = {"Display Mode", "Expand All", "Collapse All"};
+	private int displayingIndex = 0;
 	
 	private screens screenNumber = screens.goods;
 
-	[MenuItem ("Window/Economy Builder")]
+	[MenuItem ("Window/Soomla/Economy Builder")]
 	static void Init ()
 	{
 		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow (typeof (EconomyBuilder));
@@ -135,6 +138,7 @@ public class EconomyBuilder : EditorWindow
 			goodTypeIndex = 0;
 		}
 
+		addModesDisplaying(screens.goods);
 		addGenerateButton();
 
 		EditorGUILayout.EndHorizontal ();
@@ -153,9 +157,8 @@ public class EconomyBuilder : EditorWindow
 
 	void ShowGood(ZFGood good)	
 	{
-
 		EditorGUILayout.BeginHorizontal();
-		good.render = EditorGUILayout.Foldout(good.render, good.goodType.ToString() + "[" + good.ID + "]");
+		good.render = EditorGUILayout.Foldout(good.render, "<" + good.name +"> (" + good.ID + ")");
 		GUIContent deleteButtonContent = new GUIContent ("X", "Press the button if you want to delete object");
 		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteGood(good);
@@ -367,4 +370,19 @@ public class EconomyBuilder : EditorWindow
 			}
 		}
 	}
+
+	private void addModesDisplaying(screens scr)	{
+		displayingIndex = EditorGUILayout.Popup (displayingIndex, displayingModes, GUILayout.Width(150));
+		
+		if (displayingIndex == 0) {
+			displayingIndex = 0;	
+		}
+		else if (displayingIndex == 1)	{
+			editorData.expandAll((int)scr);
+		}
+		else if (displayingIndex == 2)	{
+			editorData.collapseAll((int)scr);
+		}
+		displayingIndex = 0;
+	}	
 }

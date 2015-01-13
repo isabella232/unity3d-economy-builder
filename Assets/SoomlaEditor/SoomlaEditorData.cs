@@ -362,19 +362,6 @@ public class ZFCurrencyPack
 
 public class SoomlaEditorData 
 {
-	private bool changes = true;
-
-	public void changed()	{
-				changes = true;
-		}
-
-	public bool isChangedSomething()	{
-				return changes;
-		}
-
-	public void changesWereApproved()	{
-				changes = false;
-		}
 
 	private string sameItemsBuffer = "";
 	private void rememberSameItems(string objectType, string str1, string str2)	{
@@ -934,5 +921,66 @@ public class SoomlaEditorData
         }
     }
     
-    
+    public void expandAll(int screen)	{
+		switch (screen) {
+		case 0:
+		{
+			for(int i = 0; i < this.goods.Count; i++)
+			{
+				goods[i].render = true;
+			}
+		}
+			break;
+		case 1:
+		{
+			for(int i = 0; i < this.currencies.Count; i++)
+			{
+				currencies[i].render = true;
+			}
+		}
+			break;
+		case 2:
+		{
+			for(int i = 0; i < this.currencyPacks.Count; i++)
+			{
+				currencyPacks[i].render = true;
+			}
+		}
+			break;
+		default:
+			break;
+				}
+
+	}
+
+	public void collapseAll(int screen)	{
+		switch (screen) {
+		case 0:
+		{
+			for(int i = 0; i < this.goods.Count; i++)
+			{
+				goods[i].render = false;
+			}
+		}
+			break;
+		case 1:
+		{
+			for(int i = 0; i < this.currencies.Count; i++)
+			{
+				currencies[i].render = false;
+			}
+		}
+			break;
+		case 2:
+		{
+			for(int i = 0; i < this.currencyPacks.Count; i++)
+			{
+				currencyPacks[i].render = false;
+			}
+		}
+			break;
+		default:
+			break;
+		}
+	}
 }
