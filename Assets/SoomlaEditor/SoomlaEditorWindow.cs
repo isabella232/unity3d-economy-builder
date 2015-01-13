@@ -1,4 +1,4 @@
-﻿	using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -135,19 +135,8 @@ public class EconomyBuilder : EditorWindow
 			goodTypeIndex = 0;
 		}
 
-		if(GUILayout.Button("Generate", GUILayout.Width(100), GUILayout.Height(15)))
-		{
-			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
-			{
-				EditorUtility.DisplayDialog("ERROR", editorData.getResponseAboutSameItems(), "Ok");
-			}
-			else
-			{
-				editorData.WriteToJSONFile(editorData.toJSONObject());
-				editorData.generateSoomlaAssets();
-				EditorUtility.DisplayDialog("", "File has been saved to path:/nAssets/SoomlaAssets.cs", "Ok");
-			}
-		}
+		addGenerateButton();
+
 		EditorGUILayout.EndHorizontal ();
 
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
@@ -186,25 +175,6 @@ public class EconomyBuilder : EditorWindow
 				good.marketInfo.price = EditorGUILayout.FloatField("Price", good.marketInfo.price);
 
 				good.marketInfo.productId = EditorGUILayout.TextField("Product ID", good.marketInfo.productId);
-                
-				EditorGUI.indentLevel++;
-                good.marketInfo.useIos = EditorGUILayout.BeginToggleGroup("iOS", good.marketInfo.useIos);
-				if (good.marketInfo.useIos) {
-					EditorGUI.indentLevel++;
-					good.marketInfo.iosId = EditorGUILayout.TextField(good.marketInfo.iosId);
-					EditorGUI.indentLevel--;
-				}
-				EditorGUILayout.EndToggleGroup();
-                
-				good.marketInfo.useAndroid = EditorGUILayout.BeginToggleGroup("Android", good.marketInfo.useAndroid);
-				if (good.marketInfo.useAndroid) {
-					EditorGUI.indentLevel++;
-					good.marketInfo.androidId = EditorGUILayout.TextField(good.marketInfo.androidId);
-					EditorGUI.indentLevel--;
-                }
-                EditorGUILayout.EndToggleGroup();
-
-				EditorGUI.indentLevel--;
             } else {
 				if (editorData.currencies.Count > 0) {
 					good.virtualInfo.pvi_amount = EditorGUILayout.IntField("Price", good.virtualInfo.pvi_amount);
@@ -262,10 +232,12 @@ public class EconomyBuilder : EditorWindow
 
 	void ShowCurrencies()
 	{
-		if (GUILayout.Button ("Add Currency", EditorStyles.miniButton, GUILayout.Width(100))) 
-		{
+		EditorGUILayout.BeginHorizontal();
+		if (GUILayout.Button ("Add Currency", EditorStyles.miniButton, GUILayout.Width(100))) {
 			editorData.AddCurrency();
 		}
+		addGenerateButton();
+		EditorGUILayout.EndHorizontal();
 
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
         
@@ -300,12 +272,13 @@ public class EconomyBuilder : EditorWindow
 		}
 	}
 
-	void ShowCurrencyPacks()
-	{
-		if (GUILayout.Button ("Add Currency Pack", EditorStyles.miniButton, GUILayout.Width(100))) 
-		{
+	void ShowCurrencyPacks() {
+		EditorGUILayout.BeginHorizontal();
+		if (GUILayout.Button ("Add Currency Pack", EditorStyles.miniButton, GUILayout.Width(100)))  {
 			editorData.AddCurrencyPack();
 		}
+		addGenerateButton();
+		EditorGUILayout.EndHorizontal();
 
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
 		for (int i = 0; i < editorData.currencyPacks.Count; i++)
@@ -343,24 +316,6 @@ public class EconomyBuilder : EditorWindow
 			
 			currencyPack.marketInfo.productId = EditorGUILayout.TextField("Product ID", currencyPack.marketInfo.productId);
 			
-			EditorGUI.indentLevel++;
-			currencyPack.marketInfo.useIos = EditorGUILayout.BeginToggleGroup("iOS", currencyPack.marketInfo.useIos);
-			if (currencyPack.marketInfo.useIos) {
-				EditorGUI.indentLevel++;
-				currencyPack.marketInfo.iosId = EditorGUILayout.TextField(currencyPack.marketInfo.iosId);
-				EditorGUI.indentLevel--;
-			}
-			EditorGUILayout.EndToggleGroup();
-			
-			currencyPack.marketInfo.useAndroid = EditorGUILayout.BeginToggleGroup("Android", currencyPack.marketInfo.useAndroid);
-			if (currencyPack.marketInfo.useAndroid) {
-				EditorGUI.indentLevel++;
-				currencyPack.marketInfo.androidId = EditorGUILayout.TextField(currencyPack.marketInfo.androidId);
-                EditorGUI.indentLevel--;
-            }
-            EditorGUILayout.EndToggleGroup();
-			EditorGUI.indentLevel--;
-
             // currency data
 			if (editorData.currencies.Count > 0) {
 				int indexInArray = 0;
@@ -395,5 +350,21 @@ public class EconomyBuilder : EditorWindow
 	void ShowCategories()
 	{
 		
+	}
+
+	private void addGenerateButton() {
+		if(GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(100)))
+		{
+			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
+			{
+				EditorUtility.DisplayDialog("ERROR", editorData.getResponseAboutSameItems(), "Ok");
+			}
+			else
+			{
+				editorData.WriteToJSONFile(editorData.toJSONObject());
+				editorData.generateSoomlaAssets();
+				EditorUtility.DisplayDialog("", "File has been saved to path:\nAssets/SoomlaAssets.cs", "Ok");
+			}
+		}
 	}
 }
