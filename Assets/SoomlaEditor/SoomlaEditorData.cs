@@ -705,7 +705,6 @@ public class SoomlaEditorData
 			if(goods[i].goodType == ZFGood.GoodType.SingleUseVG)
 			{
 				singleUseGoodsIDs.Add(goods[i].ID);
-				string str = "0";
 			}
 		}
 	}
@@ -883,8 +882,6 @@ public class SoomlaEditorData
         // end class
 		builder.IndentLevel--;
 		builder.AppendLine("}");
-
-		List<string> productIdentifiers = new List<string> ();
 
 		string path = @"Assets/SoomlaAssets.cs";
 		using (StreamWriter sw = File.CreateText(path))
