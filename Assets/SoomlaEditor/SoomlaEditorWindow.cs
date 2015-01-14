@@ -148,21 +148,53 @@ public class EconomyBuilder : EditorWindow
 		for (int i = 0; i < editorData.goods.Count; i++)
 		{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
-			ShowGood(editorData.goods[i]);
+//			ShowGood(editorData.goods[i]);
+			ShowGood(i);
 			EditorGUILayout.EndVertical();	
 		}
 
 		GUILayout.EndScrollView ();
 	}
 
-	void ShowGood(ZFGood good)	
+//	void ShowGood(ZFGood good)	
+	void ShowGood(int goodIndex)
 	{
+		ZFGood good = editorData.goods [goodIndex];
 		EditorGUILayout.BeginHorizontal();
 		good.render = EditorGUILayout.Foldout(good.render, "<" + good.name +"> (" + good.ID + ")");
 		GUIContent deleteButtonContent = new GUIContent ("X", "Press the button if you want to delete object");
 		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteGood(good);
 		}
+
+		if (goodIndex != 0)
+		{
+			float width = 20f;
+			if (goodIndex == editorData.goods.Count-1)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.goods[goodIndex] = editorData.goods[goodIndex-1];
+				editorData.goods[goodIndex-1] = good;
+			}
+		}
+
+		if (goodIndex != editorData.goods.Count-1)
+		{
+			float width = 20f;
+			if (goodIndex == 0)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.goods[goodIndex] = editorData.goods[goodIndex+1];
+				editorData.goods[goodIndex+1] = good;
+			}
+		}
+
 		EditorGUILayout.EndHorizontal();
         
 		if (good.render) {
@@ -248,7 +280,7 @@ public class EconomyBuilder : EditorWindow
 		{
 			GUILayout.BeginVertical(GUI.skin.box);
 			{
-				this.ShowCurrency(editorData.currencies[i]);
+				this.ShowCurrency(i);
 			}
 			GUILayout.EndVertical();
 		}
@@ -256,14 +288,43 @@ public class EconomyBuilder : EditorWindow
 		GUILayout.EndScrollView();
 	}
 
-	void ShowCurrency(ZFCurrency currency)
+	void ShowCurrency(int currencyIndex)
 	{
-
+		ZFCurrency currency = editorData.currencies [currencyIndex];
 		EditorGUILayout.BeginHorizontal();
 		currency.render = EditorGUILayout.Foldout(currency.render, currency.ID);
 		if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteCurrency(currency);
 		}
+
+		if (currencyIndex != 0)
+		{
+			float width = 20f;
+			if (currencyIndex == editorData.currencies.Count-1)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.currencies[currencyIndex] = editorData.currencies[currencyIndex-1];
+				editorData.currencies[currencyIndex-1] = currency;
+			}
+		}
+		
+		if (currencyIndex != editorData.currencies.Count-1)
+		{
+			float width = 20f;
+			if (currencyIndex == 0)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.currencies[currencyIndex] = editorData.currencies[currencyIndex+1];
+				editorData.currencies[currencyIndex+1] = currency;
+			}
+		}
+
 		EditorGUILayout.EndHorizontal();
 		
 		if (currency.render) {
@@ -288,22 +349,51 @@ public class EconomyBuilder : EditorWindow
 		{
 			GUILayout.BeginVertical(GUI.skin.box);
 			{
-				ZFCurrencyPack currencyPack = editorData.currencyPacks[i];
-				ShowCurrencyPack(currencyPack);
+				ShowCurrencyPack(i);
 			}
 			GUILayout.EndVertical();
 		}
 		GUILayout.EndScrollView();
 	}
 
-	void ShowCurrencyPack(ZFCurrencyPack currencyPack)
+	void ShowCurrencyPack(int currencyPackIndex)
 	{
-
+		ZFCurrencyPack currencyPack = editorData.currencyPacks [currencyPackIndex];
 		EditorGUILayout.BeginHorizontal();
 		currencyPack.render = EditorGUILayout.Foldout(currencyPack.render, currencyPack.ID);
 		if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.currencyPacks.Remove(currencyPack);
 		}
+
+		if (currencyPackIndex != 0)
+		{
+			float width = 20f;
+			if (currencyPackIndex == editorData.currencyPacks.Count-1)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.currencyPacks[currencyPackIndex] = editorData.currencyPacks[currencyPackIndex-1];
+				editorData.currencyPacks[currencyPackIndex-1] = currencyPack;
+			}
+		}
+		
+		if (currencyPackIndex != editorData.currencyPacks.Count-1)
+		{
+			float width = 20f;
+			if (currencyPackIndex == 0)
+			{
+				width = 40f;
+			}
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(width))) {
+				editorData.currencyPacks[currencyPackIndex] = editorData.currencyPacks[currencyPackIndex+1];
+				editorData.currencyPacks[currencyPackIndex+1] = currencyPack;
+			}
+		}
+
+
 		EditorGUILayout.EndHorizontal();
 		
 		if (currencyPack.render) {
