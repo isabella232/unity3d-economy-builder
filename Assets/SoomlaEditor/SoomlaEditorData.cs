@@ -718,11 +718,19 @@ public class SoomlaEditorData
 		builder.AppendLine("using System.Collections;");
 		builder.AppendLine("using System.Collections.Generic;");
 		builder.AppendLine("using Soomla.Store;");
+		builder.AppendLine ();
 
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// This class defines our game's economy, which includes virtual goods, virtual currencies");
+		builder.AppendLine ("/// and currency packs, virtual categories");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public class SoomlaAssets : IStoreAssets {");
 		builder.IndentLevel++;
-
 		builder.AppendLine();
+
+		builder.AppendLine ("/** Static Final Members **/");
+		builder.AppendLine ();
+
         for (int i = 0; i < currencies.Count; i++) {
 			builder.AppendLine(string.Format("public const string {0}_ITEM_ID = \"{1}\";", currencies[i].ID.ToUpper(), currencies[i].ID));
 			builder.AppendLine();
@@ -746,36 +754,47 @@ public class SoomlaEditorData
 			builder.AppendLine();
 		}
         
-        builder.AppendLine();
-        
+        builder.AppendLine ();
+		builder.AppendLine ();
 		//create constructors for each soomla object
 		//	Virtual Currencies
+		builder.AppendLine ("/** Virtual Currencies **/");
+		builder.AppendLine ();
+
 		for (int i = 0; i < currencies.Count; i++) {
 			builder.AppendLine("public static VirtualCurrency " + currencies[i].ID.ToUpper() + " = new VirtualCurrency(");
 			builder.IndentLevel ++;
-			builder.AppendLine("\"" + currencies[i].name + "\",");
-			builder.AppendLine("\"\",");
-			builder.AppendLine(currencies[i].ID.ToUpper() + "_ITEM_ID");
+			builder.AppendLine("\"" + currencies[i].name + "\",\t\t\t\t\t//name");
+			builder.AppendLine("\"\",\t\t\t\t//description");
+			builder.AppendLine(currencies[i].ID.ToUpper() + "_ITEM_ID\t\t\t\t//item id");
 			builder.IndentLevel --;
 			builder.AppendLine(");");
 			builder.AppendLine();
         }
         
+		builder.AppendLine();
+		builder.AppendLine ("/** Virtual Currency Packs **/");
+		builder.AppendLine ();
+
 		//	Virtual Currency Packs
 		for (int i = 0; i < currencyPacks.Count; i++) {
 			builder.AppendLine("public static VirtualCurrencyPack " + currencyPacks[i].ID.ToUpper() + " = new VirtualCurrencyPack(");
 			builder.IndentLevel ++;
-			builder.AppendLine("\"" + currencyPacks[i].name + "\",");
-			builder.AppendLine("\"" + currencyPacks[i].description + "\",");
-			builder.AppendLine(currencyPacks[i].ID.ToUpper() + "_ITEM_ID,");
-			builder.AppendLine(currencyPacks[i].currency_amount + ",");
-			builder.AppendLine(currencyPacks[i].currency_itemId.ToUpper() + "_ITEM_ID,");
+			builder.AppendLine("\"" + currencyPacks[i].name + "\",\t\t\t\t\t//name");
+			builder.AppendLine("\"" + currencyPacks[i].description + "\",\t\t\t\t//description");
+			builder.AppendLine(currencyPacks[i].ID.ToUpper() + "_ITEM_ID,\t\t\t\t//item id");
+			builder.AppendLine(currencyPacks[i].currency_amount + ",\t\t\t\t//number of currencies in the pack");
+			builder.AppendLine(currencyPacks[i].currency_itemId.ToUpper() + "_ITEM_ID,\t\t\t\t//the currency associated with this pack");
 			builder.AppendLine("new PurchaseWithMarket(" + currencyPacks[i].ID.ToUpper() + "_PRODUCT_ID, " + currencyPacks[i].marketInfo.price + ")");
 			builder.IndentLevel --;
 			builder.AppendLine(");");
             builder.AppendLine();
         }
         
+		builder.AppendLine ();
+		builder.AppendLine ("/** Virtual Goods **/");
+		builder.AppendLine ();
+
 		//	Virtual Goods
 		for (int i = 0; i < goods.Count; i++) { 
 			builder.AppendLine(string.Format("public static VirtualGood {0} = new {1}(", goods[i].ID.ToUpper(), goods[i].goodType));
@@ -783,20 +802,20 @@ public class SoomlaEditorData
 
 
 			if (goods[i].goodType == ZFGood.GoodType.SingleUsePackVG) {
-				builder.AppendLine("\"" + goods[i].good_itemId + "\",");
-				builder.AppendLine(goods[i].good_amount + ",");
+				builder.AppendLine("\"" + goods[i].good_itemId + "\",\t\t\t\t//item id");
+				builder.AppendLine(goods[i].good_amount + ",\t\t\t\t//number of goods in the pack");
 			} else if (goods[i].goodType == ZFGood.GoodType.EquippableVG) {
 				builder.AppendLine("EquippableVG.EquippingModel.LOCAL,");
 			}
                 
-			builder.AppendLine("\"" + goods[i].name + "\",");
-			builder.AppendLine("\"" + goods[i].description + "\",");
-			builder.AppendLine(goods[i].ID.ToUpper() + "_ITEM_ID,");
+			builder.AppendLine("\"" + goods[i].name + "\",\t\t\t\t\t//name");
+			builder.AppendLine("\"" + goods[i].description + "\",\t\t\t\t//description");
+			builder.AppendLine(goods[i].ID.ToUpper() + "_ITEM_ID,\t\t\t\t//item id");
 
 			if(goods[i].typePurchase == ZFGood.PurchaseInfo.Market) {
-				builder.AppendLine("new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")");
+				builder.AppendLine("new PurchaseWithMarket(" + goods[i].ID.ToUpper() + "_PRODUCT_ID, " + goods[i].marketInfo.price + ")\t\t\t\t//the way this virtual good is purchased");
 			} else {
-				builder.AppendLine("new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")");
+				builder.AppendLine("new PurchaseWithVirtualItem(" + goods[i].virtualInfo.pvi_itemId.ToUpper() + "_ITEM_ID, " + goods[i].virtualInfo.pvi_amount + ")\t\t\t\t//the way this virtual good is purchased");
             }
             builder.IndentLevel --;
             builder.AppendLine(");");
@@ -804,7 +823,8 @@ public class SoomlaEditorData
 		}
        
 		builder.AppendLine();
-        
+		builder.AppendLine ("/** Virtual Categories **/");
+		builder.AppendLine ("// The muffin rush theme doesn't support categories, so we just put everything under a general category.");
         // add GENERAL_CATEGORY
 		// remove last ", "
 		goodsVariables = goodsVariables.Remove (goodsVariables.Length - 2, 2);
@@ -818,6 +838,9 @@ public class SoomlaEditorData
 
 		//get() methods for Soomla objects
 		// implement GetVersion
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// see parent.");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public int GetVersion() {");
 		builder.IndentLevel ++;
 		builder.AppendLine("return 0;");
@@ -833,6 +856,10 @@ public class SoomlaEditorData
 				currenciesSequence += ", ";
             }
 		}
+
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// see parent.");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public VirtualCurrency[] GetCurrencies() {");
 		builder.IndentLevel ++;
 		builder.AppendLine("return new VirtualCurrency[]{" + currenciesSequence + "};");
@@ -848,6 +875,10 @@ public class SoomlaEditorData
 				currencyPacksSequence += ", ";
 			}
 		}
+
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// see parent.");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public VirtualCurrencyPack[] GetCurrencyPacks() {");
 		builder.IndentLevel ++;
 		builder.AppendLine("return new VirtualCurrencyPack[]{" + currencyPacksSequence + "};");
@@ -863,6 +894,10 @@ public class SoomlaEditorData
 				goodsSequence += ", ";
 			}
 		}
+
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// see parent.");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public VirtualGood[] GetGoods() {");
 		builder.IndentLevel ++;
 		builder.AppendLine("return new VirtualGood[]{" + goodsSequence + "};");
@@ -871,6 +906,9 @@ public class SoomlaEditorData
         builder.AppendLine();
 
 		// implement GetCategories
+		builder.AppendLine ("/// <summary>");
+		builder.AppendLine ("/// see parent.");
+		builder.AppendLine ("/// </summary>");
 		builder.AppendLine("public VirtualCategory[] GetCategories() {");
 		builder.IndentLevel ++;
 		builder.AppendLine("return new VirtualCategory[]{GENERAL_CATEGORY};");

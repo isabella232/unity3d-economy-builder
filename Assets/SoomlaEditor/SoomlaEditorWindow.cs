@@ -263,6 +263,8 @@ public class EconomyBuilder : EditorWindow
 		if (GUILayout.Button ("Add Currency", EditorStyles.miniButton, GUILayout.Width(100))) {
 			editorData.AddCurrency();
 		}
+
+		addModesDisplaying(screens.currencies);
 		addGenerateButton();
 		EditorGUILayout.EndHorizontal();
 
@@ -286,7 +288,7 @@ public class EconomyBuilder : EditorWindow
 
 		EditorGUILayout.BeginHorizontal();
 
-		currency.render = EditorGUILayout.Foldout(currency.render, currency.ID);
+		currency.render = EditorGUILayout.Foldout(currency.render, "<" + currency.name +"> (" + currency.ID + ")");
 
 		if (currencyIndex != 0)
 		{
@@ -326,6 +328,7 @@ public class EconomyBuilder : EditorWindow
 		if (GUILayout.Button ("Add Currency Pack", EditorStyles.miniButton, GUILayout.Width(100)))  {
 			editorData.AddCurrencyPack();
 		}
+		addModesDisplaying(screens.currencyPacks);
 		addGenerateButton();
 		EditorGUILayout.EndHorizontal();
 
@@ -347,7 +350,7 @@ public class EconomyBuilder : EditorWindow
 
 		EditorGUILayout.BeginHorizontal();
 
-		currencyPack.render = EditorGUILayout.Foldout(currencyPack.render, currencyPack.ID);
+		currencyPack.render = EditorGUILayout.Foldout(currencyPack.render, "<" + currencyPack.name +"> (" + currencyPack.ID + ")");
 
 		if (currencyPackIndex != 0)
 		{
