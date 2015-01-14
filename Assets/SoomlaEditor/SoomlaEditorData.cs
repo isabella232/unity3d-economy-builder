@@ -14,12 +14,6 @@ public class MarketInfo
 	public bool useAndroid = false;
 	public string androidId = "androidProductId";
 	
-	public bool useAmazon = false;
-	public string amazonId = "";
-	
-	public bool useWindowsPhone8 = false;
-	public string windowsPhone8Id = "";
-	
 	public PurchaseType type = null;
 	
 	public float price = 0.99f;
@@ -40,10 +34,6 @@ public class MarketInfo
 		this.iosId = marketInfo.iosId;
 		this.useAndroid = marketInfo.useAndroid;
 		this.androidId = marketInfo.androidId;
-		this.useAmazon = marketInfo.useAmazon;
-		this.amazonId = marketInfo.amazonId;
-		this.useWindowsPhone8 = marketInfo.useWindowsPhone8;
-		this.windowsPhone8Id = marketInfo.windowsPhone8Id;
 		this.price = marketInfo.price;
 	}
 	
@@ -51,7 +41,7 @@ public class MarketInfo
 
 	public bool ifMarketPurchaseFull()
 	{
-		if ((this.iosId != "" || this.androidId != "" || this.amazonId != "" || this.windowsPhone8Id != "") && this.price != 0.0f) {
+		if ((this.iosId != "" || this.androidId != "") && this.price != 0.0f) {
 			return true;
 		} else {
 			return false;
@@ -72,14 +62,6 @@ public class MarketInfo
 		if (this.useAndroid) 
 		{
 			marketItem.AddField("androidId", this.androidId);
-		}
-		if (this.useAmazon)
-		{
-			marketItem.AddField("amazonId", this.amazonId);
-		}
-		if (this.useWindowsPhone8)
-		{
-			marketItem.AddField("windowsPhone8Id", this.windowsPhone8Id);
 		}
 		marketItem.AddField ("price", this.price);
 		marketItem.AddField ("consumable", (int)this.consumable);
@@ -114,20 +96,6 @@ public class MarketInfo
 		if (this.useAndroid)
 		{
 			this.androidId = jsonAndroidId.str;
-		}
-		
-		JSONObject jsonAmazonId = marketItem.GetField ("amazonId");
-		this.useAmazon = (jsonAmazonId != null);
-		if (this.useAmazon)
-		{
-			this.amazonId = jsonAmazonId.str;
-		}
-		
-		JSONObject jsonWindowPhone8Id = marketItem.GetField ("windowsPhone8Id");
-		this.useWindowsPhone8 = (jsonWindowPhone8Id != null);
-		if (this.useWindowsPhone8)
-		{
-			this.windowsPhone8Id = jsonWindowPhone8Id.str;
 		}
 		
 		this.price = marketItem.GetField ("price").n;
@@ -320,14 +288,14 @@ public class ZFCurrency
 	public JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
-		json.AddField ("ID", this.ID);
+		json.AddField ("itemId", this.ID);
 		json.AddField ("name", this.name);
 		return json;
 	}
 	
 	public void fromJSONObject(JSONObject json)
 	{
-		this.ID = json.GetField("ID").str;
+		this.ID = json.GetField("itemId").str;
 		this.name = json.GetField("name").str;
 	}
 }
@@ -370,19 +338,19 @@ public class ZFCurrencyPack
 	public JSONObject toJSONObject()
 	{
 		JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
-		json.AddField ("ID", this.ID);
+		json.AddField ("itemId", this.ID);
 		json.AddField ("name", this.name);
 		json.AddField ("description", this.description);
 		json.AddField ("currency_itemId", this.currency_itemId);
 		json.AddField ("currency_amount", this.currency_amount);
 		json.AddField ("purchasableItem", marketInfo.toJSONObject()); 
-
+		
 		return json;
 	}
-
+	
 	public void fromJSONObject(JSONObject json)
 	{
-		this.ID = json.GetField("ID").str;
+		this.ID = json.GetField("itemId").str;
 		this.name = json.GetField("name").str;
 		this.description = json.GetField("description").str;
 		this.currency_itemId = json.GetField ("currency_itemId").str;
@@ -394,19 +362,6 @@ public class ZFCurrencyPack
 
 public class SoomlaEditorData 
 {
-	private bool changes = true;
-
-	public void changed()	{
-				changes = true;
-		}
-
-	public bool isChangedSomething()	{
-				return changes;
-		}
-
-	public void changesWereApproved()	{
-				changes = false;
-		}
 
 	private string sameItemsBuffer = "";
 	private void rememberSameItems(string objectType, string str1, string str2)	{
@@ -966,5 +921,66 @@ public class SoomlaEditorData
         }
     }
     
-    
+    public void expandAll(int screen)	{
+		switch (screen) {
+		case 0:
+		{
+			for(int i = 0; i < this.goods.Count; i++)
+			{
+				goods[i].render = true;
+			}
+		}
+			break;
+		case 1:
+		{
+			for(int i = 0; i < this.currencies.Count; i++)
+			{
+				currencies[i].render = true;
+			}
+		}
+			break;
+		case 2:
+		{
+			for(int i = 0; i < this.currencyPacks.Count; i++)
+			{
+				currencyPacks[i].render = true;
+			}
+		}
+			break;
+		default:
+			break;
+				}
+
+	}
+
+	public void collapseAll(int screen)	{
+		switch (screen) {
+		case 0:
+		{
+			for(int i = 0; i < this.goods.Count; i++)
+			{
+				goods[i].render = false;
+			}
+		}
+			break;
+		case 1:
+		{
+			for(int i = 0; i < this.currencies.Count; i++)
+			{
+				currencies[i].render = false;
+			}
+		}
+			break;
+		case 2:
+		{
+			for(int i = 0; i < this.currencyPacks.Count; i++)
+			{
+				currencyPacks[i].render = false;
+			}
+		}
+			break;
+		default:
+			break;
+		}
+	}
 }
