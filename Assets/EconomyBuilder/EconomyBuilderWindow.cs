@@ -141,22 +141,28 @@ public class EconomyBuilder : EditorWindow
 		addModesDisplaying(screens.goods);
 		addGenerateButton();
 
+
 		EditorGUILayout.EndHorizontal ();
 
-		scrollPos = GUILayout.BeginScrollView (scrollPos);
+		scrollPos = GUILayout.BeginScrollView (scrollPos, GUILayout.Height(this.position.height*0.75f));
 
 		for (int i = 0; i < editorData.goods.Count; i++)
 		{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
 //			ShowGood(editorData.goods[i]);
 			ShowGood(i);
-			EditorGUILayout.EndVertical();	
+			EditorGUILayout.EndVertical();
 		}
 
 		GUILayout.EndScrollView ();
-	}
 
-//	void ShowGood(ZFGood good)	
+		EditorGUILayout.Space ();
+		EditorGUILayout.Space ();
+		EditorGUILayout.BeginHorizontal(GUI.skin.box);
+		EditorGUILayout.LabelField ("It's a placeholder for some tips or hints", EditorStyles.label);
+		EditorGUILayout.EndHorizontal ();
+	}
+	
 	void ShowGood(int goodIndex)
 	{
 		ZFGood good = editorData.goods [goodIndex];
@@ -455,4 +461,9 @@ public class EconomyBuilder : EditorWindow
 		}
 		displayingIndex = 0;
 	}	
+
+	private void addPlaceholder()
+	{
+
+	}
 }
