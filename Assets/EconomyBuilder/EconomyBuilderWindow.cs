@@ -32,7 +32,7 @@ public class EconomyBuilder : EditorWindow
 	[MenuItem ("Window/Soomla/Economy Builder")]
 	static void Init ()
 	{
-		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow(typeof (EconomyBuilder), false, "Soomla Economy Builder");
+		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow(typeof (EconomyBuilder), false, "Economy Builder");
 		window.InitSoomlaEditorData ();
 	}
 
