@@ -29,10 +29,10 @@ public class EconomyBuilder : EditorWindow
 	
 	private screens screenNumber = screens.goods;
 
-	[MenuItem ("Window/Soomla/EconomyBuilder")]
+	[MenuItem ("Window/Soomla/Economy Builder")]
 	static void Init ()
 	{
-		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow (typeof (EconomyBuilder));
+		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow(typeof (EconomyBuilder), false, "Soomla Economy Builder");
 		window.InitSoomlaEditorData ();
 	}
 
@@ -162,7 +162,7 @@ public class EconomyBuilder : EditorWindow
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
 		EditorGUILayout.BeginHorizontal(GUI.skin.box);
-		EditorGUILayout.LabelField ("It's a placeholder for some tips or hints", EditorStyles.label);
+		EditorGUILayout.HelpBox ("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean aliquam arcu sed nulla dapibus, id vulputate dolor vehicula. Sed porta pulvinar tellus sit amet lobortis. Nullam suscipit pellentesque arcu, sed viverra lectus pretium sit amet. Aenean vel ex in augue tristique condimentum ut at nisi. Sed posuere dignissim sapien. Maecenas quis neque sit amet eros gravida fermentum. Sed ac tellus vel lacus vulputate finibus vitae at nulla. Integer at posuere libero. Sed fringilla rutrum purus eget vestibulum. Aenean maximus tristique condimentum.", MessageType.Info, true);
 		EditorGUILayout.EndHorizontal ();
 	}
 	
