@@ -24,7 +24,7 @@ public class EconomyBuilder : EditorWindow
 	private string[] goodTypeOptions = {"Add Virtual Good", "Single Use", "Lifetime", "Equippable", "Single Use Pack"}; 
 	private int goodTypeIndex = 0;
 
-	private string[] displayingModes = {"V", "Expand All", "Collapse All"};
+	private string[] displayingModes = {"+-", "Expand All", "Collapse All"};
 	private int displayingIndex = 0;
 	
 	private screens screenNumber = screens.goods;
@@ -138,13 +138,16 @@ public class EconomyBuilder : EditorWindow
 			goodTypeIndex = 0;
 		}
 
-		addModesDisplaying(screens.goods);
 		addGenerateButton();
 
 
 		EditorGUILayout.EndHorizontal ();
 
-		scrollPos = GUILayout.BeginScrollView (scrollPos, GUILayout.Height(this.position.height*0.75f));
+		EditorGUILayout.BeginHorizontal ();
+		addModesDisplaying(screens.goods);
+		EditorGUILayout.EndHorizontal ();
+
+        scrollPos = GUILayout.BeginScrollView (scrollPos);
 
 		for (int i = 0; i < editorData.goods.Count; i++)
 		{
@@ -172,7 +175,7 @@ public class EconomyBuilder : EditorWindow
 
 		if (goodIndex != 0)
 		{
-			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Move Up"); 
 			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.goods[goodIndex] = editorData.goods[goodIndex-1];
 				editorData.goods[goodIndex-1] = good;
@@ -181,14 +184,14 @@ public class EconomyBuilder : EditorWindow
 
 		if (goodIndex != editorData.goods.Count-1)
 		{
-			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Move Down"); 
 			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.goods[goodIndex] = editorData.goods[goodIndex+1];
 				editorData.goods[goodIndex+1] = good;
 			}
 		}
 
-		GUIContent deleteButtonContent = new GUIContent ("X", "Press the button if you want to delete object");
+		GUIContent deleteButtonContent = new GUIContent ("X", "Delete");
 		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteGood(good);
 		}
@@ -226,7 +229,7 @@ public class EconomyBuilder : EditorWindow
 						}
 					}
 					
-					int index = EditorGUILayout.Popup("VG", indexInArray, currencyNames.ToArray()); 
+					int index = EditorGUILayout.Popup("Item", indexInArray, currencyNames.ToArray()); 
 					good.virtualInfo.pvi_itemId = editorData.currencies[index].ID;
 				} else {
 					EditorGUILayout.HelpBox("You have no defined currencies", MessageType.Warning, true);
@@ -270,8 +273,11 @@ public class EconomyBuilder : EditorWindow
 			editorData.AddCurrency();
 		}
 
-		addModesDisplaying(screens.currencies);
 		addGenerateButton();
+		EditorGUILayout.EndHorizontal();
+
+		EditorGUILayout.BeginHorizontal();
+		addModesDisplaying(screens.currencies);
 		EditorGUILayout.EndHorizontal();
 
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
@@ -298,7 +304,7 @@ public class EconomyBuilder : EditorWindow
 
 		if (currencyIndex != 0)
 		{
-			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Move Up"); 
 			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.currencies[currencyIndex] = editorData.currencies[currencyIndex-1];
 				editorData.currencies[currencyIndex-1] = currency;
@@ -307,14 +313,15 @@ public class EconomyBuilder : EditorWindow
 		
 		if (currencyIndex != editorData.currencies.Count-1)
 		{
-			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Move Down"); 
 			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.currencies[currencyIndex] = editorData.currencies[currencyIndex+1];
 				editorData.currencies[currencyIndex+1] = currency;
 			}
 		}
 
-		if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
+		GUIContent deleteButtonContent = new GUIContent ("X", "Delete");
+		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.DeleteCurrency(currency);
 		}
 		
@@ -334,8 +341,11 @@ public class EconomyBuilder : EditorWindow
 		if (GUILayout.Button ("Add Currency Pack", EditorStyles.miniButton, GUILayout.Width(100)))  {
 			editorData.AddCurrencyPack();
 		}
-		addModesDisplaying(screens.currencyPacks);
 		addGenerateButton();
+		EditorGUILayout.EndHorizontal();
+
+		EditorGUILayout.BeginHorizontal();
+		addModesDisplaying(screens.currencyPacks);
 		EditorGUILayout.EndHorizontal();
 
 		scrollPos = GUILayout.BeginScrollView (scrollPos);
@@ -360,7 +370,7 @@ public class EconomyBuilder : EditorWindow
 
 		if (currencyPackIndex != 0)
 		{
-			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Press the button if you want to move up object"); 
+			GUIContent btnMoveUp = new GUIContent (char.ConvertFromUtf32(8593), "Move Up"); 
 			if(GUILayout.Button(btnMoveUp, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.currencyPacks[currencyPackIndex] = editorData.currencyPacks[currencyPackIndex-1];
 				editorData.currencyPacks[currencyPackIndex-1] = currencyPack;
@@ -369,14 +379,15 @@ public class EconomyBuilder : EditorWindow
 		
 		if (currencyPackIndex != editorData.currencyPacks.Count-1)
 		{
-			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Press the button if you want to move down object"); 
+			GUIContent btnMoveDown = new GUIContent (char.ConvertFromUtf32(8595), "Move Down"); 
 			if(GUILayout.Button(btnMoveDown, EditorStyles.miniButton, GUILayout.Width(20f))) {
 				editorData.currencyPacks[currencyPackIndex] = editorData.currencyPacks[currencyPackIndex+1];
 				editorData.currencyPacks[currencyPackIndex+1] = currencyPack;
 			}
 		}
 
-		if(GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
+		GUIContent deleteButtonContent = new GUIContent ("X", "Delete");
+		if(GUILayout.Button(deleteButtonContent, EditorStyles.miniButton, GUILayout.Width(20))) {
 			editorData.currencyPacks.Remove(currencyPack);
 		}
 
