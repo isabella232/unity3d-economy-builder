@@ -46,7 +46,7 @@ public class SoomlaAssets : IStoreAssets {
 	/** Virtual Currencies **/
 	
 	public static VirtualCurrency CURRENCY_COINS = new VirtualCurrency(
-		"Coins",				//name
+		"Coins",					//name
 		"",				//description
 		CURRENCY_COINS_ITEM_ID				//item id
 	);
@@ -55,7 +55,7 @@ public class SoomlaAssets : IStoreAssets {
 	/** Virtual Currency Packs **/
 	
 	public static VirtualCurrencyPack BAG_OF_COINS = new VirtualCurrencyPack(
-		"Bag of Coins",				//name
+		"Bag of Coins",					//name
 		"The most affordable pack",				//description
 		BAG_OF_COINS_ITEM_ID,				//item id
 		1000,				//number of currencies in the pack
@@ -68,7 +68,7 @@ public class SoomlaAssets : IStoreAssets {
 	
 	public static VirtualGood DOUBLE_BARREL_RIFLE = new EquippableVG(
 		EquippableVG.EquippingModel.LOCAL,
-		"Double Barrel Rifle",				//name
+		"Double Barrel Rifle",					//name
 		"Use this gun for extra fire power and less accuracy",				//description
 		DOUBLE_BARREL_RIFLE_ITEM_ID,				//item id
 		new PurchaseWithVirtualItem(CURRENCY_COINS_ITEM_ID, 500)				//the way this virtual good is purchased
@@ -76,14 +76,14 @@ public class SoomlaAssets : IStoreAssets {
 	
 	public static VirtualGood SNIPER_RIFLE = new EquippableVG(
 		EquippableVG.EquippingModel.LOCAL,
-		"Sniper Rifle",				//name
+		"Sniper Rifle",					//name
 		"Use this gun for less power and much more accuracy",				//description
 		SNIPER_RIFLE_ITEM_ID,				//item id
 		new PurchaseWithVirtualItem(CURRENCY_COINS_ITEM_ID, 800)				//the way this virtual good is purchased
 	);
 	
 	public static VirtualGood REMOVE_ADS = new LifetimeVG(
-		"Remove Ads",				//name
+		"Remove Ads",					//name
 		"Clean up your shooting field from ads forever",				//description
 		REMOVE_ADS_ITEM_ID,				//item id
 		new PurchaseWithMarket(REMOVE_ADS_PRODUCT_ID, 1.99)				//the way this virtual good is purchased
@@ -92,14 +92,14 @@ public class SoomlaAssets : IStoreAssets {
 	public static VirtualGood FIVE_CLIPS = new SingleUsePackVG(
 		"single_clip",				//item id
 		5,				//number of goods in the pack
-		"Single clip",				//name
+		"Single clip",					//name
 		"A single clip gives you 30 bullets to shoot",				//description
 		FIVE_CLIPS_ITEM_ID,				//item id
 		new PurchaseWithVirtualItem(CURRENCY_COINS_ITEM_ID, 40)				//the way this virtual good is purchased
 	);
 	
 	public static VirtualGood SINGLE_CLIP = new SingleUseVG(
-		"Single clip",				//name
+		"Single clip",					//name
 		"A single clip gives you 30 bullets to shoot",				//description
 		SINGLE_CLIP_ITEM_ID,				//item id
 		new PurchaseWithVirtualItem(CURRENCY_COINS_ITEM_ID, 10)				//the way this virtual good is purchased
