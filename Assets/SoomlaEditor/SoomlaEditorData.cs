@@ -365,7 +365,7 @@ public class SoomlaEditorData
 
 	private string sameItemsBuffer = "";
 	private void rememberSameItems(string objectType, string str1, string str2)	{
-		sameItemsBuffer = objectType + " have same id's:\n";
+		sameItemsBuffer = objectType + " have same IDs:\n";
 		sameItemsBuffer += str1 + "\n" + str2;
 	}
 	public string getResponseAboutSameItems()	{
