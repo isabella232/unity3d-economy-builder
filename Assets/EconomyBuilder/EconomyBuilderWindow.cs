@@ -162,7 +162,7 @@ public class EconomyBuilder : EditorWindow
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
 		EditorGUILayout.BeginHorizontal(GUI.skin.box);
-		EditorGUILayout.HelpBox ("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean aliquam arcu sed nulla dapibus, id vulputate dolor vehicula. Sed porta pulvinar tellus sit amet lobortis. Nullam suscipit pellentesque arcu, sed viverra lectus pretium sit amet. Aenean vel ex in augue tristique condimentum ut at nisi. Sed posuere dignissim sapien. Maecenas quis neque sit amet eros gravida fermentum. Sed ac tellus vel lacus vulputate finibus vitae at nulla. Integer at posuere libero. Sed fringilla rutrum purus eget vestibulum. Aenean maximus tristique condimentum.", MessageType.Info, true);
+		EditorGUILayout.HelpBox ("Basic Instructions: navigate throught the goods, currencies and currency packs tabs.  In each tab you may add new definitions of items in your virtual economy as well as edit or delete existing ones.  The economy model is documented in detail in the SOOMLA knowledge base: http://know.soom.la/unity/store/store_model/.  The economy builder is in beta, any feedback is appreciated and can be sent to builder@soom.la.", MessageType.Info, true);
 		EditorGUILayout.EndHorizontal ();
 	}
 	
