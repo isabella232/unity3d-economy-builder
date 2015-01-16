@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.IO;
 using Soomla.Store;
 
 public class EconomyBuilder : EditorWindow 
@@ -162,7 +163,18 @@ public class EconomyBuilder : EditorWindow
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
 		EditorGUILayout.BeginHorizontal(GUI.skin.box);
+
+		FileStream fs = new FileStream(Application.dataPath + @"/Soomla/Resources/soom_logo.png", FileMode.Open, FileAccess.Read);
+		byte[] imageData = new byte[fs.Length];
+		fs.Read(imageData, 0, (int)fs.Length);
+		Texture2D soomlaLogoTexture = new Texture2D(300, 92);
+		soomlaLogoTexture.LoadImage(imageData);
+
+		GUIContent logoImgLabel = new GUIContent (soomlaLogoTexture);
+		EditorGUILayout.LabelField(logoImgLabel, GUILayout.MaxHeight(70), GUILayout.ExpandWidth(true));
 		EditorGUILayout.HelpBox ("Basic Instructions: navigate throught the goods, currencies and currency packs tabs.  In each tab you may add new definitions of items in your virtual economy as well as edit or delete existing ones.  The economy model is documented in detail in the SOOMLA knowledge base: http://know.soom.la/unity/store/store_model/.  The economy builder is in beta, any feedback is appreciated and can be sent to builder@soom.la.", MessageType.Info, true);
+		GameObject.DestroyImmediate(soomlaLogoTexture);
+
 		EditorGUILayout.EndHorizontal ();
 	}
 	
