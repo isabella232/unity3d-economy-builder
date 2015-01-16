@@ -57,13 +57,14 @@ namespace Soomla
 
 		public void OnInfoGUI() {
 			EditorGUILayout.HelpBox("SOOMLA Framework Info", MessageType.None);
-			SoomlaEditorScript.SelectableLabelField(frameworkVersion, "1.0.2");
+			SoomlaEditorScript.SelectableLabelField(frameworkVersion, "1.0.4");
 			SoomlaEditorScript.SelectableLabelField(buildVersion, "1");
 			EditorGUILayout.Space();
 		}
 
 		GUIContent soomlaSecLabel = new GUIContent("Soomla Secret [?]:", "All the user information will be encrypted using this secret.");
-		GUIContent debugMsgsLabel = new GUIContent("Debug Messages [?]:", "Check if you want to show debug messages in the log (iOS and Android).");
+		GUIContent debugMsgsLabel = new GUIContent("Debug Native [?]:", "Check if you want to show debug messages from native code in the log (iOS and Android).");
+		GUIContent debugUnityMsgsLabel = new GUIContent("Debug Unity [?]:", "Check if you want to show debug messages from Unity code in the log (Editor, iOS and Android).");
 
 		public void OnSoomlaGUI() {
 			FileStream fs = new FileStream(Application.dataPath + @"/Soomla/Resources/soom_logo.png", FileMode.Open, FileAccess.Read);
@@ -87,6 +88,7 @@ namespace Soomla
 			EditorGUILayout.EndHorizontal();
 
 			DebugMessages = EditorGUILayout.Toggle(debugMsgsLabel, DebugMessages);
+			DebugUnityMessages = EditorGUILayout.Toggle(debugUnityMsgsLabel, DebugUnityMessages);
 
 			EditorGUILayout.Space();
 
@@ -142,6 +144,24 @@ namespace Soomla
 				if (Convert.ToBoolean(v) != value)
 				{
 					SoomlaEditorScript.Instance.setSettingsValue("DebugMessages",value.ToString());
+					SoomlaEditorScript.DirtyEditor();
+				}
+			}
+		}
+
+		public static bool DebugUnityMessages
+		{
+			get {
+				string value;
+				return SoomlaEditorScript.Instance.SoomlaSettings.TryGetValue("DebugUnityMessages", out value) ? Convert.ToBoolean(value) : true;
+			}
+			set
+			{
+				string v;
+				SoomlaEditorScript.Instance.SoomlaSettings.TryGetValue("DebugUnityMessages", out v);
+				if (Convert.ToBoolean(v) != value)
+				{
+					SoomlaEditorScript.Instance.setSettingsValue("DebugUnityMessages",value.ToString());
 					SoomlaEditorScript.DirtyEditor();
 				}
 			}
