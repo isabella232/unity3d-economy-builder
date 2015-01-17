@@ -52,14 +52,11 @@ public class EconomyBuilder : EditorWindow
 
 		EditorGUILayout.BeginHorizontal();
 		{
-			//EditorGUILayout.Toggle(
-			if (GUILayout.Toggle(screenNumber == screens.goods, "Goods", EditorStyles.toolbarButton))
-				screenNumber = screens.goods;
-			
-			if (GUILayout.Toggle(screenNumber == screens.currencies, "Currencies", EditorStyles.toolbarButton))
+			if (GUILayout.Toggle(screenNumber == screens.goods, "Goods", EditorStyles.toolbarButton)) 
+				screenNumber = screens.goods;	
+			else if (GUILayout.Toggle(screenNumber == screens.currencies, "Currencies", EditorStyles.toolbarButton))
 				screenNumber = screens.currencies;
-			
-			if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currency Packs", EditorStyles.toolbarButton))
+			else if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currency Packs", EditorStyles.toolbarButton))
 				screenNumber = screens.currencyPacks;
 			
 //			if (GUILayout.Toggle(screenNumber == screens.categories, "Categories", EditorStyles.toolbarButton))
@@ -68,19 +65,6 @@ public class EconomyBuilder : EditorWindow
 //			}
 		}
 		EditorGUILayout.EndHorizontal();
-		/*
-		if(GUILayout.Button("Generate"))
-		{
-			if(!editorData.areUniqueGoods() || !editorData.areUniqueCurrencies() || !editorData.areUniqueCurrencyPacks())
-			{
-				EditorUtility.DisplayDialog("ERROR", editorData.getResponseAboutSameItems(), "Ok");
-			}
-			else
-			{
-				editorData.WriteToJSONFile(editorData.toJSONObject());
-				editorData.generateSoomlaAssets();
-			}
-		}*/
 
 		if(editorData != null)
 			this.ShowData();
@@ -152,7 +136,6 @@ public class EconomyBuilder : EditorWindow
 		for (int i = 0; i < editorData.goods.Count; i++)
 		{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
-//			ShowGood(editorData.goods[i]);
 			ShowGood(i);
 			EditorGUILayout.EndVertical();
 		}
@@ -472,9 +455,4 @@ public class EconomyBuilder : EditorWindow
 		}
 		displayingIndex = 0;
 	}	
-
-	private void addPlaceholder()
-	{
-
-	}
 }
