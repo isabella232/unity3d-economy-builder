@@ -363,6 +363,7 @@ public class ZFCurrencyPack
 public class SoomlaEditorData 
 {
 
+	private string jsonPath = Application.dataPath + @"/EconomyBuilder/SoomlaAssets.json";
 	private string sameItemsBuffer = "";
 	private void rememberSameItems(string objectType, string str1, string str2)	{
 		sameItemsBuffer = objectType + " have same IDs:\n";
@@ -530,11 +531,10 @@ public class SoomlaEditorData
 
 	public void ReadFromJSONFile()
 	{
-		string path = @"SoomlaAssets.json";
 		string jsonString = "";
-		if (File.Exists(path))
+		if (File.Exists(jsonPath))
 		{
-			using (StreamReader sr = File.OpenText(path))
+			using (StreamReader sr = File.OpenText(jsonPath))
 			{
 				jsonString = sr.ReadToEnd();
 			}
@@ -626,8 +626,7 @@ public class SoomlaEditorData
 	public void WriteToJSONFile(JSONObject obj)
 	{
 		string stringJSON = obj.ToString ();
-		string path = @"SoomlaAssets.json";
-		using (StreamWriter sw = File.CreateText(path))
+		using (StreamWriter sw = File.CreateText(jsonPath))
 		{
 			sw.Write(stringJSON);
 		}

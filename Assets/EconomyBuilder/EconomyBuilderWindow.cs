@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.IO;
 using Soomla.Store;
 
 public class EconomyBuilder : EditorWindow 
@@ -32,7 +33,7 @@ public class EconomyBuilder : EditorWindow
 	[MenuItem ("Window/Soomla/Economy Builder")]
 	static void Init ()
 	{
-		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow(typeof (EconomyBuilder), false, "Economy Builder");
+		EconomyBuilder window = (EconomyBuilder)EditorWindow.GetWindow(typeof (EconomyBuilder), false, "EconomyBuilder");
 		window.InitSoomlaEditorData ();
 	}
 
@@ -145,7 +146,18 @@ public class EconomyBuilder : EditorWindow
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
 		EditorGUILayout.BeginHorizontal(GUI.skin.box);
-		EditorGUILayout.HelpBox ("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean aliquam arcu sed nulla dapibus, id vulputate dolor vehicula. Sed porta pulvinar tellus sit amet lobortis. Nullam suscipit pellentesque arcu, sed viverra lectus pretium sit amet. Aenean vel ex in augue tristique condimentum ut at nisi. Sed posuere dignissim sapien. Maecenas quis neque sit amet eros gravida fermentum. Sed ac tellus vel lacus vulputate finibus vitae at nulla. Integer at posuere libero. Sed fringilla rutrum purus eget vestibulum. Aenean maximus tristique condimentum.", MessageType.Info, true);
+
+		FileStream fs = new FileStream(Application.dataPath + @"/Soomla/Resources/soom_logo.png", FileMode.Open, FileAccess.Read);
+		byte[] imageData = new byte[fs.Length];
+		fs.Read(imageData, 0, (int)fs.Length);
+		Texture2D soomlaLogoTexture = new Texture2D(300, 92);
+		soomlaLogoTexture.LoadImage(imageData);
+
+		GUIContent logoImgLabel = new GUIContent (soomlaLogoTexture);
+		EditorGUILayout.LabelField(logoImgLabel, GUILayout.MaxHeight(70), GUILayout.ExpandWidth(true));
+		EditorGUILayout.HelpBox ("Basic Instructions: navigate throught the goods, currencies and currency packs tabs.  In each tab you may add new definitions of items in your virtual economy as well as edit or delete existing ones.  The economy model is documented in detail in the SOOMLA knowledge base: http://know.soom.la/unity/store/store_model/.  The economy builder is in beta, any feedback is appreciated and can be sent to builder@soom.la.", MessageType.Info, true);
+		GameObject.DestroyImmediate(soomlaLogoTexture);
+
 		EditorGUILayout.EndHorizontal ();
 	}
 	
