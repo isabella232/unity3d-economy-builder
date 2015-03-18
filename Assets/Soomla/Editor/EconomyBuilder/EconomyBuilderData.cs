@@ -363,7 +363,7 @@ public class ZFCurrencyPack
 public class SoomlaEditorData 
 {
 
-	private string jsonPath = Application.dataPath + @"/EconomyBuilder/SoomlaAssets.json";
+	private string jsonPath = Application.dataPath + @"/Soomla/Editor/EconomyBuilder/SoomlaAssets.json";
 	private string sameItemsBuffer = "";
 	private void rememberSameItems(string objectType, string str1, string str2)	{
 		sameItemsBuffer = objectType + " have same IDs:\n";
