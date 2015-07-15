@@ -55,9 +55,9 @@ public class EconomyBuilder : EditorWindow
 		{
 			if (GUILayout.Toggle(screenNumber == screens.goods, "Goods", EditorStyles.toolbarButton)) 
 				screenNumber = screens.goods;	
-			else if (GUILayout.Toggle(screenNumber == screens.currencies, "Currencies", EditorStyles.toolbarButton))
+			if (GUILayout.Toggle(screenNumber == screens.currencies, "Currencies", EditorStyles.toolbarButton))
 				screenNumber = screens.currencies;
-			else if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currency Packs", EditorStyles.toolbarButton))
+			if (GUILayout.Toggle(screenNumber == screens.currencyPacks, "Currency Packs", EditorStyles.toolbarButton))
 				screenNumber = screens.currencyPacks;
 			
 //			if (GUILayout.Toggle(screenNumber == screens.categories, "Categories", EditorStyles.toolbarButton))
