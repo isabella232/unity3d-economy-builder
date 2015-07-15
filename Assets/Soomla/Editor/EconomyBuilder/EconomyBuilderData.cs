@@ -98,7 +98,7 @@ public class MarketInfo
 			this.androidId = jsonAndroidId.str;
 		}
 		
-		this.price = marketItem.GetField ("price").n;
+		this.price = marketItem.GetField ("price").f;
 		this.consumable = (Consumable)int.Parse(marketItem.GetField("consumable").ToString());
 	}
 }
