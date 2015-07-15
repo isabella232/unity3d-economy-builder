@@ -34,8 +34,10 @@ namespace Soomla.Store
 					_instance = new SoomlaStoreAndroid();
 					#elif UNITY_IOS && !UNITY_EDITOR
 					_instance = new SoomlaStoreIOS();
-					#else
-					_instance = new SoomlaStore();
+                    #elif UNITY_WP8 && !UNITY_EDITOR
+					_instance = new SoomlaStoreWP();
+                    #else
+                    _instance = new SoomlaStore();
 					#endif
 				}
 				return _instance;
@@ -63,28 +65,30 @@ namespace Soomla.Store
 				SoomlaUtils.LogDebug(TAG, "StoreEvents Component not found in scene. We're continuing from here but you won't get many events.");
 			}
 
-			if (initialized) {
-				string err = "SoomlaStore is already initialized. You can't initialize it twice!";
-				StoreEvents.Instance.onUnexpectedErrorInStore(err, true);
-				SoomlaUtils.LogError(TAG, err);
+			if (Initialized) {
+				StoreEvents.Instance.onUnexpectedStoreError("{\"errorCode\": 0}", true);
+				SoomlaUtils.LogError(TAG, "SoomlaStore is already initialized. You can't initialize it twice!");
 				return false;
 			}
 
 			SoomlaUtils.LogDebug(TAG, "SoomlaStore Initializing ...");
 
-			instance._loadBillingService();
-
 			StoreInfo.SetStoreAssets(storeAssets);
 
-#if UNITY_IOS
+			instance._loadBillingService();
+			
+			#if UNITY_IOS
 			// On iOS we only refresh market items
 			instance._refreshMarketItemsDetails();
 #elif UNITY_ANDROID
 			// On Android we refresh market items and restore transactions
 			instance._refreshInventory();
+#elif UNITY_WP8
+            instance._refreshInventory();
+            
 #endif
 
-			initialized = true;
+			Initialized = true;
 			StoreEvents.Instance.onSoomlaStoreInitialized("", true);
 
 			return true;
@@ -163,10 +167,11 @@ namespace Soomla.Store
 			eventJSON.AddField("payload", payload);
 			StoreEvents.Instance.onMarketPurchaseStarted(eventJSON.print());
             
-			// in the editor we just give the item... no real market.
-			item.Give(1);
-            
-			// simulate onMarketPurchase event
+			// simulate events as they happen on the device
+			// the order is : 
+			//    onMarketPurchase
+			//    give item
+			//    onItemPurchase
 			StoreEvents.Instance.RunLater(() => {
 				eventJSON = new JSONObject();
 				eventJSON.AddField("itemId", item.ItemId);
@@ -181,6 +186,17 @@ namespace Soomla.Store
 			#endif
 				eventJSON.AddField("extra", extraJSON);
 				StoreEvents.Instance.onMarketPurchase(eventJSON.print());
+
+				// in the editor we just give the item... no real market.
+				item.Give(1);
+	
+				// We have to make sure the ItemPurchased event will be fired AFTER the balance/currency-changed events.
+				StoreEvents.Instance.RunLater(() => {
+					eventJSON = new JSONObject();
+					eventJSON.AddField("itemId", item.ItemId);
+					eventJSON.AddField("payload", payload);
+	            	StoreEvents.Instance.onItemPurchased(eventJSON.print());
+				});
 			});
 #endif
 		}
@@ -204,7 +220,11 @@ namespace Soomla.Store
 
 		protected const string TAG = "SOOMLA SoomlaStore";
 
-		private static bool initialized;
+		/// <summary>
+		/// Gets a value indicating whether <see cref="Soomla.Store.SoomlaStore"/> is initialized.
+		/// </summary>
+		/// <value><c>true</c> if initialized; otherwise, <c>false</c>.</value>
+		public static bool Initialized { get; private set; }
 
 	}
 }

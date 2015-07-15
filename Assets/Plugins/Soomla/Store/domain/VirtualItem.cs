@@ -48,7 +48,13 @@ namespace Soomla.Store {
 		{
 		}
 
-		/// <summary>
+#if UNITY_WP8 && !UNITY_EDITOR
+		protected VirtualItem(SoomlaWpCore.SoomlaEntity<SoomlaWpStore.domain.VirtualItem> wpVirtualItem)
+            : base(wpVirtualItem.GetId(),wpVirtualItem.GetName(),wpVirtualItem.GetDescription())
+            {
+		}
+#endif
+        /// <summary>
 		/// Constructor.
 		/// Generates an instance of <c>VirtualItem</c> from the given <c>JSONObject</c>.
 		/// </summary>
@@ -68,7 +74,7 @@ namespace Soomla.Store {
 			return base.GetHashCode ();
 		}
 
-		/// <summary>
+        /// <summary>
 		/// Gives your user the given amount of the specific virtual item.
 		/// For example, when your users play your game for the first time you GIVE them 1000 gems.
 		///
@@ -132,10 +138,12 @@ namespace Soomla.Store {
 
 		/// <summary>
 		/// Save this instance with changes that were made to it.
-		/// The saving is done in the metadata in StoreInfo and being persisted to the local DB.
+		/// The saving is done in the metadata in StoreInfo and being persisted to the local DB
+		/// (if requested).
 		/// </summary>
-		public void Save() {
-			StoreInfo.Save(this);
+		/// <param name="saveToDB">Should the changes be persisted to local DB</param>
+		public void Save(bool saveToDB = true) {
+			StoreInfo.Save(this, saveToDB);
 		}
 	}
 }

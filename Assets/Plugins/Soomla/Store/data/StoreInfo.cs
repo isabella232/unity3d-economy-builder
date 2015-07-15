@@ -42,8 +42,10 @@ namespace Soomla.Store
 					_instance = new StoreInfoAndroid();
 					#elif UNITY_IOS && !UNITY_EDITOR
 					_instance = new StoreInfoIOS();
-					#else
-					_instance = new StoreInfo();
+                    #elif UNITY_WP8 && !UNITY_EDITOR
+                    _instance = new StoreInfoWP();
+                    #else
+                    _instance = new StoreInfo();
 					#endif
 				}
 				return _instance;
@@ -193,23 +195,37 @@ namespace Soomla.Store
 		}
 
 		/// <summary>
-		/// Replaces the given virtual item, and then saves the store's metadata.
+		/// Replaces the given virtual item, and then saves the store's metadata
+		/// (if requested).
 		/// </summary>
 		/// <param name="virtualItem">the virtual item to replace.</param>
-		public static void Save(VirtualItem virtualItem) {
+		/// <param name="saveToDB">should the virtual item be persisted to local DB</param>
+		public static void Save(VirtualItem virtualItem, bool saveToDB = true) {
 			replaceVirtualItem(virtualItem);
-			Save();
+
+			if (saveToDB) {
+				Save();
+			}
 		}
 
 		/// <summary>
-		/// Replaces the given virtual item, and then saves the store's metadata.
+		/// Replaces the given virtual item, and then saves the store's metadata
+		/// (if requested).
 		/// </summary>
 		/// <param name="virtualItem">the virtual item to replace.</param>
-		public static void Save(List<VirtualItem> virtualItems) {
+		/// <param name="saveToDB">should the virtual item be persisted to local DB</param>
+		public static void Save(List<VirtualItem> virtualItems, bool saveToDB = true) {
+			if ((virtualItems == null) && (virtualItems.Count == 0)) {
+				return;
+			}
+
 			foreach(VirtualItem virtualItem in virtualItems) {
 				replaceVirtualItem(virtualItem);
 			}
-			Save();
+
+			if (saveToDB) {
+				Save();
+			}
 		}
 
 
